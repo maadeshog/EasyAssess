@@ -1,0 +1,204 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: books
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required, max 200 chars)
+    //   - author: string (required, max 200 chars)
+    //   - isbn: string (optional, max 50 chars)
+    //   - publisher: string (required, max 200 chars)
+    //   - year: number (required, > 1900)
+    //   - type: string (required, in ['textbook', 'reference', 'ebook'])
+    //   - coverUrl: string (optional, valid URL or empty)
+    //   - description: string (optional, max 2000 chars)
+    //   - createdAt: number (required, immutable)
+    //   - updatedAt: number (required)
+    //   - createdBy: string (required, immutable, matches uid)
+    //   - status: string (required, in ['active', 'trashed'])
+    //   - deletedAt: number (optional)
+    //
+    // Collection: assessments
+    // Document ID: auto-generated
+    // Fields:
+    //   - bookId: string (required)
+    //   - userId: string (required, immutable, matches uid)
+    //   - userName: string (required, max 100 chars)
+    //   - scores: map (required, contains contentAccuracy, readability, pedagogy, visualDesign, relevance as numbers 1-10)
+    //   - comments: string (required, max 5000 chars)
+    //   - recommendation: string (required, in ['highly-recommended', 'recommended', 'neutral', 'not-recommended'])
+    //   - createdAt: number (required, immutable)
+    //   - status: string (required, in ['active', 'trashed'])
+    //   - deletedAt: number (optional)
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null && (request.auth.token.email_verified == true || request.auth.token.phone_number != null);
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((request.auth.token.email == "maadeshog@gmail.com" && request.auth.token.email_verified == true) ||
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
+
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() >= minLen &&
+              request.resource.data[field].size() <= maxLen);
+    }
+
+    function isValidUrl(url) {
+      return url == "" || (url is string && (url.matches("^https://.*") || url.matches("^http://.*")));
+    }
+
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidBook(data) {
+      return hasRequiredFields(['title', 'author', 'isbn', 'publisher', 'year', 'type', 'createdAt', 'updatedAt', 'createdBy', 'status', 'source']) &&
+             validStringLength('title', 1, 200) &&
+             validStringLength('author', 1, 200) &&
+             validStringLength('publisher', 1, 200) &&
+             validStringLength('source', 1, 200) &&
+             request.resource.data.isbn is string &&
+             (request.resource.data.isbn.matches("^[0-9-]{10,20}[0-9X]?$")) &&
+             isValidOptionalString('description', 0, 2000) &&
+             data.year is number && data.year > 1900 &&
+             data.type in ['textbook', 'reference', 'ebook'] &&
+             (!('coverUrl' in data) || isValidUrl(data.coverUrl)) &&
+             data.createdAt is number &&
+             data.updatedAt is number &&
+             data.createdBy is string && data.createdBy.size() > 0 &&
+             data.status in ['active', 'trashed'] &&
+             (!('deletedAt' in data) || data.deletedAt is number);
+    }
+
+    function isValidAssessment(data) {
+      return hasRequiredFields(['bookId', 'userId', 'userName', 'scores', 'comments', 'recommendation', 'createdAt', 'status']) &&
+             data.bookId is string && data.bookId.size() > 0 &&
+             data.userId is string && data.userId.size() > 0 &&
+             validStringLength('userName', 1, 100) &&
+             validStringLength('comments', 1, 5000) &&
+             data.recommendation in ['highly-recommended', 'recommended', 'neutral', 'not-recommended'] &&
+             data.scores is map &&
+             data.scores.keys().hasOnly(['contentAccuracy', 'readability', 'pedagogy', 'visualDesign', 'relevance']) &&
+             data.scores.contentAccuracy is number && data.scores.contentAccuracy >= 1 && data.scores.contentAccuracy <= 10 &&
+             data.scores.readability is number && data.scores.readability >= 1 && data.scores.readability <= 10 &&
+             data.scores.pedagogy is number && data.scores.pedagogy >= 1 && data.scores.pedagogy <= 10 &&
+             data.scores.visualDesign is number && data.scores.visualDesign >= 1 && data.scores.visualDesign <= 10 &&
+             data.scores.relevance is number && data.scores.relevance >= 1 && data.scores.relevance <= 10 &&
+             data.createdAt is number &&
+             data.status in ['active', 'trashed'] &&
+             (!('deletedAt' in data) || data.deletedAt is number);
+    }
+
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'displayName', 'role', 'createdAt']) &&
+             hasOnlyAllowedFields(['uid', 'email', 'phoneNumber', 'displayName', 'role', 'createdAt', 'photoURL']) &&
+             data.uid is string && data.uid.size() > 0 &&
+             (!('email' in data) || data.email is string) &&
+             (!('phoneNumber' in data) || data.phoneNumber is string) &&
+             data.displayName is string && data.displayName.size() > 0 &&
+             (!('photoURL' in data) || (data.photoURL == null || data.photoURL is string)) &&
+             data.role in ['admin', 'evaluator'] &&
+             data.createdAt is number;
+    }
+
+    function isValidFeedback(data) {
+      return hasRequiredFields(['message', 'createdAt']) &&
+             hasOnlyAllowedFields(['userId', 'name', 'email', 'rating', 'message', 'createdAt']) &&
+             (!('userId' in data) || (data.userId is string && data.userId.size() > 0)) &&
+             (!('name' in data) || (data.name is string && data.name.size() > 0)) &&
+             (!('email' in data) || (data.email is string && data.email.size() > 0)) &&
+             (!('rating' in data) || (data.rating is number && data.rating >= 1 && data.rating <= 5)) &&
+             validStringLength('message', 1, 2000) &&
+             data.createdAt is number;
+    }
+
+    match /books/{bookId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+                    isValidBook(request.resource.data) &&
+                    request.resource.data.createdBy == request.auth.uid;
+      allow update: if isAuthenticated() &&
+                    isValidBook(request.resource.data) &&
+                    areImmutableFieldsUnchanged(['createdBy', 'createdAt']) &&
+                    (
+                      isAdmin() ||
+                      (
+                        resource.data.createdBy == request.auth.uid &&
+                        areImmutableFieldsUnchanged(['status', 'deletedAt'])
+                      )
+                    );
+      allow delete: if isAdmin();
+    }
+
+    match /assessments/{assessmentId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+                    isValidAssessment(request.resource.data) &&
+                    request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() &&
+                    isValidAssessment(request.resource.data) &&
+                    (resource.data.userId == request.auth.uid || isAdmin()) &&
+                    areImmutableFieldsUnchanged(['userId', 'bookId', 'createdAt']);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                    isValidUser(request.resource.data) && 
+                    request.resource.data.uid == request.auth.uid &&
+                    ((request.resource.data.role == 'evaluator') || isAdmin());
+      allow update: if isAuthenticated() && 
+                    isValidUser(request.resource.data) && 
+                    (request.auth.uid == userId || isAdmin()) &&
+                    areImmutableFieldsUnchanged(['uid', 'createdAt']) &&
+                    ((request.resource.data.role == resource.data.role) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /feedback/{feedbackId} {
+      allow create: if true; // Allow anyone to submit feedback
+      allow read: if isAdmin();
+    }
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}

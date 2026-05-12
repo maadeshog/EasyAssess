@@ -1,0 +1,98 @@
+{
+  "entities": {
+    "Book": {
+      "title": "Book",
+      "description": "An academic resource such as a textbook, reference book, or e-book.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the book" },
+        "author": { "type": "string", "description": "Author(s) of the book" },
+        "isbn": { "type": "string", "description": "ISBN of the book" },
+        "publisher": { "type": "string", "description": "Publisher of the book" },
+        "year": { "type": "number", "description": "Publication year" },
+        "type": { "type": "string", "enum": ["textbook", "reference", "ebook"], "description": "Type of resource" },
+        "coverUrl": { "type": "string", "description": "URL to the cover image" },
+        "source": { "type": "string", "description": "Acquisition source of the book" },
+        "description": { "type": "string", "description": "Description of the book" },
+        "createdAt": { "type": "number", "description": "Creation timestamp" },
+        "updatedAt": { "type": "number", "description": "Last update timestamp" },
+        "createdBy": { "type": "string", "description": "UID of the user who added the book" },
+        "status": { "type": "string", "enum": ["active", "trashed"], "description": "Status of the resource" },
+        "deletedAt": { "type": "number", "description": "Timestamp when the resource was moved to trash" }
+      },
+      "required": ["title", "author", "isbn", "publisher", "year", "type", "createdAt", "updatedAt", "createdBy", "status"]
+    },
+    "Assessment": {
+      "title": "Assessment",
+      "description": "An evaluation of a book by a user.",
+      "type": "object",
+      "properties": {
+        "bookId": { "type": "string", "description": "ID of the evaluated book" },
+        "userId": { "type": "string", "description": "UID of the evaluator" },
+        "userName": { "type": "string", "description": "Display name of the evaluator" },
+        "scores": {
+          "type": "object",
+          "properties": {
+            "contentAccuracy": { "type": "number" },
+            "readability": { "type": "number" },
+            "pedagogy": { "type": "number" },
+            "visualDesign": { "type": "number" },
+            "relevance": { "type": "number" }
+          },
+          "required": ["contentAccuracy", "readability", "pedagogy", "visualDesign", "relevance"]
+        },
+        "comments": { "type": "string", "description": "Detailed comments" },
+        "recommendation": { "type": "string", "enum": ["highly-recommended", "recommended", "neutral", "not-recommended"] },
+        "createdAt": { "type": "number", "description": "Creation timestamp" },
+        "status": { "type": "string", "enum": ["active", "trashed"], "description": "Status of the assessment" },
+        "deletedAt": { "type": "number", "description": "Timestamp when the assessment was moved to trash" }
+      },
+      "required": ["bookId", "userId", "userName", "scores", "comments", "recommendation", "createdAt", "status"]
+    },
+    "User": {
+      "title": "User",
+      "description": "A user profile with role-based access control.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "role": { "type": "string", "enum": ["admin", "evaluator"], "description": "User role" },
+        "createdAt": { "type": "number", "description": "Creation timestamp" }
+      },
+      "required": ["uid", "email", "displayName", "role", "createdAt"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "User feedback about the application.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user (optional)" },
+        "name": { "type": "string", "description": "Name of the person providing feedback" },
+        "email": { "type": "string", "description": "Email of the person providing feedback" },
+        "rating": { "type": "number", "description": "Rating from 1 to 5" },
+        "message": { "type": "string", "description": "Feedback message" },
+        "createdAt": { "type": "number", "description": "Creation timestamp" }
+      },
+      "required": ["message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/books/{bookId}": {
+      "schema": { "$ref": "#/entities/Book" },
+      "description": "Collection of academic resources."
+    },
+    "/assessments/{assessmentId}": {
+      "schema": { "$ref": "#/entities/Assessment" },
+      "description": "Collection of book assessments."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Collection of user profiles."
+    },
+    "/feedback/{feedbackId}": {
+      "schema": { "$ref": "#/entities/Feedback" },
+      "description": "Collection of user feedback messages."
+    }
+  }
+}
