@@ -23,24 +23,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <script>
-      // Clear buggy cached service worker intercepts immediately and trigger onetime secure reload
-      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          if (registrations.length > 0) {
-            console.log('Stale service workers found, purging and reloading securely...');
-            for (var i = 0; i < registrations.length; i++) {
-              registrations[i].unregister();
-            }
-            if (!sessionStorage.getItem('pwa-sw-clean-reload-v1')) {
-              sessionStorage.setItem('pwa-sw-clean-reload-v1', 'true');
-              window.location.reload();
-            }
-          }
-        }).catch(function(err) {
-          console.warn('SW cleanup warning:', err);
-        });
-      }
-
       // Animation safety fallback
       window.addEventListener('error', function(e) {
         // Disable motion if an animation-related error occurs
