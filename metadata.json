@@ -1,5 +1,6 @@
 {
   "name": "EasyAssess",
   "description": "A professional quality assessment platform for textbooks, reference books, and e-books with advanced evaluation metrics and real-time analytics.",
-  "requestFramePermissions": ["microphone"]
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

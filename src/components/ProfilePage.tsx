@@ -76,7 +76,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, books, assessmen
         <div className="grid gap-8 md:grid-cols-2">
           <div className="rounded-3xl bg-black/60 p-8 border border-noir-border/20 space-y-2">
             <div className="flex items-center gap-3 text-cyan">
-              <BookOpen size={20} />
+              <img src="/logo.svg" alt="Books" className="h-5 w-5 object-contain" />
               <span className="text-xs font-bold uppercase tracking-widest">Resources Contributed</span>
             </div>
             <div className="text-4xl font-serif font-bold text-white">{userBooks.length}</div>

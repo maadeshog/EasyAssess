@@ -113,7 +113,7 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -125,67 +125,67 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-[32px] sm:rounded-[40px] border border-noir-border/40 bg-black/40 shadow-2xl flex flex-col"
+            className="relative w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden rounded-[24px] sm:rounded-[40px] border border-noir-border/40 bg-black/40 shadow-2xl flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-noir-border/20 p-6 sm:p-8 shrink-0">
+            <div className="flex items-center justify-between border-b border-noir-border/20 p-4 sm:p-8 shrink-0">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white">
                   <ShieldCheck size={12} />
                   {step === 'entry' ? '1. Submission' : step === 'screening' ? '2. Automated Screening' : 'Submission Complete'}
                 </div>
-                <h2 className="font-serif text-3xl font-bold text-white">
+                <h2 className="font-serif text-xl sm:text-3xl font-bold text-white">
                   {step === 'entry' ? 'Add New Resource' : step === 'screening' ? 'Smart Assessment' : 'Resource Verified'}
                 </h2>
               </div>
               <button onClick={handleClose} className="rounded-full p-2 text-zinc-400 hover:bg-black/60 hover:text-white transition-colors">
-                <X size={24} />
+                <X size={20} />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               {step === 'entry' && (
-                <form onSubmit={handleSubmit(onSubmit)} className="p-6 sm:p-8 space-y-8">
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <div className="space-y-2">
+                <form onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-8 space-y-4 sm:space-y-8">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-1 sm:space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Resource Title</label>
-                      <Input {...register('title')} placeholder="e.g. Principles of Quantum Mechanics" />
+                      <Input {...register('title')} placeholder="e.g. Principles of Quantum Mechanics" className="h-10 sm:h-12 text-sm" />
                       {errors.title && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.title.message}</p>}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1 sm:space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Lead Author</label>
-                      <Input {...register('author')} placeholder="e.g. Dr. Richard Feynman" />
+                      <Input {...register('author')} placeholder="e.g. Dr. Richard Feynman" className="h-10 sm:h-12 text-sm" />
                       {errors.author && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.author.message}</p>}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1 sm:space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">ISBN Number</label>
-                      <Input {...register('isbn')} placeholder="e.g. 978-0-13-110362-7" />
+                      <Input {...register('isbn')} placeholder="e.g. 978-0-13-110362-7" className="h-10 sm:h-12 text-sm" />
                       {errors.isbn && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.isbn.message}</p>}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1 sm:space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Publication Year</label>
-                      <Input type="number" {...register('year', { valueAsNumber: true })} />
+                      <Input type="number" {...register('year', { valueAsNumber: true })} className="h-10 sm:h-12 text-sm" />
                       {errors.year && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.year.message}</p>}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1 sm:space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Publisher</label>
-                      <Input {...register('publisher')} placeholder="e.g. Oxford University Press" />
+                      <Input {...register('publisher')} placeholder="e.g. Oxford University Press" className="h-10 sm:h-12 text-sm" />
                       {errors.publisher && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.publisher.message}</p>}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1 sm:space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Acquisition Source</label>
-                      <Input {...register('source')} placeholder="e.g. University Library, Open Access, etc." />
+                      <Input {...register('source')} placeholder="e.g. University Library, Open Access, etc." className="h-10 sm:h-12 text-sm" />
                       {errors.source && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.source.message}</p>}
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Resource Type</label>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4">
                       {(['textbook', 'reference', 'ebook'] as const).map((type) => (
                         <label key={type} className="relative cursor-pointer group">
                           <input type="radio" value={type} {...register('type')} className="peer sr-only" />
-                          <div className="flex h-12 items-center justify-center rounded-2xl border border-noir-border/40 bg-black/60 text-[10px] font-bold uppercase tracking-widest text-zinc-400 transition-all peer-checked:border-noir-border peer-checked:bg-noir-border peer-checked:text-white group-hover:border-noir-border/80">
+                          <div className="flex h-10 sm:h-12 items-center justify-center rounded-2xl border border-noir-border/40 bg-black/60 text-[10px] font-bold uppercase tracking-widest text-zinc-400 transition-all peer-checked:border-noir-border peer-checked:bg-noir-border peer-checked:text-white group-hover:border-noir-border/80">
                             {type}
                           </div>
                         </label>
@@ -193,30 +193,30 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Cover Image URL</label>
                     <div className="relative">
-                      <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                      <Input {...register('coverUrl')} className="pl-12" placeholder="https://example.com/cover.jpg" />
+                      <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                      <Input {...register('coverUrl')} className="pl-12 h-10 sm:h-12 text-sm" placeholder="https://example.com/cover.jpg" />
                     </div>
                     {errors.coverUrl && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.coverUrl.message}</p>}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Short Abstract</label>
                     <textarea
                       {...register('description')}
-                      rows={4}
-                      className="w-full rounded-2xl border border-noir-border/40 bg-black/60 p-4 text-sm text-white placeholder:text-zinc-700 focus:ring-2 focus:ring-noir-border/50 outline-none transition-all"
+                      rows={3}
+                      className="w-full rounded-2xl border border-noir-border/40 bg-black/60 p-3 text-sm text-white placeholder:text-zinc-700 focus:ring-2 focus:ring-noir-border/50 outline-none transition-all"
                       placeholder="Provide a brief overview of the resource's academic scope..."
                     />
                   </div>
 
-                  <div className="flex gap-4 pt-4">
-                    <Button type="button" variant="outline" onClick={handleClose} className="flex-1 h-14 rounded-2xl border-noir-border/40 text-zinc-500">
+                  <div className="flex gap-2 sm:gap-4 pt-2">
+                    <Button type="button" variant="outline" onClick={handleClose} className="flex-1 h-12 sm:h-14 rounded-2xl border-noir-border/40 text-zinc-500 text-xs sm:text-sm font-bold">
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={isSubmitting} className="flex-1 h-14 rounded-2xl cyan-gradient text-white font-bold shadow-lg">
+                    <Button type="submit" disabled={isSubmitting} className="flex-1 h-12 sm:h-14 rounded-2xl cyan-gradient text-white font-bold shadow-lg text-xs sm:text-sm">
                       {isSubmitting ? 'Registering...' : 'Initiate Submission'}
                     </Button>
                   </div>

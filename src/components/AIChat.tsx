@@ -178,88 +178,92 @@ export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, o
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:py-12 sm:px-6 lg:px-8 h-[calc(100vh-12rem)] flex flex-col space-y-8">
+    <div className="mx-auto max-w-4xl px-2 py-4 sm:py-12 sm:px-6 lg:px-8 h-[calc(100vh-11rem)] flex flex-col space-y-4 sm:space-y-8">
       {/* Top Header & Back Button */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4 sm:gap-6">
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={onBack} 
-          className="rounded-full h-12 w-12 border border-noir-border/20 text-zinc-500 hover:text-cyan hover:border-cyan/40 transition-all bg-black/20"
+          className="rounded-full h-10 w-10 sm:h-12 sm:w-12 border border-noir-border/20 text-zinc-500 hover:text-cyan hover:border-cyan/40 transition-all bg-black/20"
           title="Back to Home"
         >
-          <ArrowLeft size={24} />
+          <ArrowLeft size={20} />
         </Button>
         <div className="h-px flex-1 border-b border-noir-border/10"></div>
-        <div className="flex items-center gap-3 text-white">
-          <Bot size={20} />
-          <h2 className="text-sm font-bold uppercase tracking-[0.3em]">AI Support System</h2>
+        <div className="flex items-center gap-2 sm:gap-3 text-white">
+          <Bot size={18} />
+          <h2 className="text-[10px] font-bold uppercase tracking-[0.3em]">AI Support System</h2>
         </div>
       </div>
 
-      <div className="flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl cyan-gradient flex items-center justify-center text-white shadow-lg animate-pulse">
-            <Bot size={28} />
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between shrink-0">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl cyan-gradient flex items-center justify-center text-white shadow-lg animate-pulse">
+            <Bot size={24} />
           </div>
           <div>
-            <h1 className="text-3xl font-serif font-bold text-white flex items-center gap-2">
+            <h1 className="text-xl sm:text-3xl font-serif font-bold text-white flex items-center gap-1.5">
               AI Assistant
-              <Sparkles className="text-cyan animate-pulse" size={20} />
+              <Sparkles className="text-cyan animate-pulse" size={16} />
             </h1>
-            <p className="text-zinc-500 text-sm">Intelligent archive analysis & support</p>
+            <p className="text-zinc-500 text-xs text-light">Intelligent archive analysis & support</p>
           </div>
         </div>
-        <div className="flex gap-3">
-          <AnimatePresence>
-            {showSearch && (
-              <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: 200, opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
-                className="relative"
-              >
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search history..."
-                  className="h-12 pl-10 pr-4 bg-black/40 border-noir-border/40 rounded-2xl text-xs"
-                  autoFocus
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              setShowSearch(!showSearch);
-              if (showSearch) setSearchQuery('');
-            }}
-            className={cn(
-              "h-12 w-12 rounded-2xl border-noir-border/40 p-0",
-              showSearch ? "bg-cyan/10 text-cyan border-cyan/30" : "text-zinc-500 hover:text-cyan"
-            )}
-            title="Search Messages"
-          >
-            {showSearch ? <X size={20} /> : <Search size={20} />}
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => setMessages([{ role: 'assistant', content: "Chat cleared. How else can I help?" }])}
-            className="h-12 rounded-2xl border-noir-border/40 text-zinc-500 hover:text-red-400"
-            title="Clear Chat"
-          >
-            <Trash2 size={20} />
-          </Button>
+        <div className="flex gap-2 sm:gap-3 items-center justify-between sm:justify-end w-full sm:w-auto">
+          <div className="flex-1 sm:flex-initial flex justify-end">
+            <AnimatePresence>
+              {showSearch && (
+                <motion.div
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 150, opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  className="relative"
+                >
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search history..."
+                    className="h-10 pl-9 pr-4 bg-black/40 border-noir-border/40 rounded-2xl text-xs"
+                    autoFocus
+                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowSearch(!showSearch);
+                if (showSearch) setSearchQuery('');
+              }}
+              className={cn(
+                "h-10 w-10 rounded-2xl border-noir-border/40 p-0",
+                showSearch ? "bg-cyan/10 text-cyan border-cyan/30" : "text-zinc-500 hover:text-cyan"
+              )}
+              title="Search Messages"
+            >
+              {showSearch ? <X size={18} /> : <Search size={18} />}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setMessages([{ role: 'assistant', content: "Chat cleared. How else can I help?" }])}
+              className="h-10 rounded-2xl border-noir-border/40 text-zinc-500 hover:text-red-400 font-bold text-xs"
+              title="Clear Chat"
+            >
+              <Trash2 size={18} />
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 glass-panel rounded-[32px] border border-noir-border/20 bg-black/40 flex flex-col overflow-hidden">
+      <div className="flex-1 min-h-0 glass-panel rounded-[24px] sm:rounded-[32px] border border-noir-border/20 bg-black/40 flex flex-col overflow-hidden">
         {/* Messages */}
         <div 
           ref={scrollRef}
-          className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 custom-scrollbar"
+          className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-4 sm:space-y-6 custom-scrollbar"
         >
           {filteredMessages.length === 0 && searchQuery && (
             <div className="text-center py-20">
@@ -274,20 +278,20 @@ export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, o
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.3 }}
               className={cn(
-                "flex gap-4 max-w-[85%]",
+                "flex gap-3 sm:gap-4 max-w-[92%] sm:max-w-[85%]",
                 msg.role === 'user' ? "ml-auto flex-row-reverse" : ""
               )}
             >
               <div className={cn(
-                "h-10 w-10 shrink-0 rounded-xl flex items-center justify-center shadow-lg border",
+                "h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg border",
                 msg.role === 'user' 
                   ? "bg-zinc-800 border-zinc-700 text-zinc-300" 
                   : "cyan-gradient border-cyan/20 text-white"
               )}>
-                {msg.role === 'user' ? <User size={18} /> : <Bot size={18} />}
+                {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
               </div>
               <div className={cn(
-                "rounded-2xl p-4 text-sm leading-relaxed",
+                "rounded-2xl p-3 sm:p-4 text-xs sm:text-sm leading-relaxed",
                 msg.role === 'user' 
                   ? "bg-zinc-800/50 text-zinc-300 border border-zinc-700/50" 
                   : "bg-noir-border/10 text-zinc-200 border border-noir-border/20"
@@ -300,12 +304,12 @@ export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, o
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex gap-4"
+              className="flex gap-3"
             >
-              <div className="h-10 w-10 shrink-0 rounded-xl cyan-gradient flex items-center justify-center text-white shadow-lg border border-cyan/20">
-                <Loader2 size={18} className="animate-spin" />
+              <div className="h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-lg sm:rounded-xl cyan-gradient flex items-center justify-center text-white shadow-lg border border-cyan/20">
+                <Loader2 size={14} className="animate-spin" />
               </div>
-              <div className="bg-noir-border/10 rounded-2xl p-4 border border-noir-border/20">
+              <div className="bg-noir-border/10 rounded-2xl p-3 sm:p-4 border border-noir-border/20">
                 <div className="flex gap-1">
                   <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="h-1.5 w-1.5 rounded-full bg-cyan" />
                   <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="h-1.5 w-1.5 rounded-full bg-cyan" />
@@ -317,7 +321,7 @@ export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, o
         </div>
 
         {/* Input */}
-        <div className="p-6 border-t border-noir-border/10 bg-black/20 shrink-0">
+        <div className="p-4 sm:p-6 border-t border-noir-border/10 bg-black/20 shrink-0">
           <AnimatePresence>
             {voiceError && (
               <motion.div
@@ -365,7 +369,7 @@ export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, o
                   )}
                 </button>
                 <div className="h-6 w-px bg-noir-border/20" />
-                <BookOpen size={16} className="text-zinc-700" />
+                <img src="/logo.svg" alt="" className="h-4 w-4 object-contain opacity-30" />
               </div>
             </div>
             <Button

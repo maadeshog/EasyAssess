@@ -5,6 +5,7 @@ import { Book, Assessment, UserProfile } from '@/src/types';
 import { BookCard } from './BookCard';
 import { Button, Input, Card, Skeleton } from './ui';
 import { cn } from '@/src/lib/utils';
+import { RatingTrendsChart } from './RatingTrendsChart';
 
 interface DashboardProps {
   books: Book[];
@@ -101,7 +102,7 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
         </div>
       </div>
       {/* Decorative Background Icon */}
-      <div className="fixed -bottom-32 -left-32 text-zinc-900/10 pointer-events-none z-0">
+      <div className="fixed -bottom-32 -left-32 text-zinc-900/10 pointer-events-none z-0 overflow-hidden">
         <motion.div
           animate={{ 
             rotate: [0, 360],
@@ -112,25 +113,34 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
             ease: "linear" 
           }}
           style={{ willChange: 'transform' }}
+          className="hidden sm:block"
         >
           <BarChart3 size={700} strokeWidth={0.5} />
         </motion.div>
+        <div className="sm:hidden">
+          <BarChart3 size={300} strokeWidth={0.5} />
+        </div>
       </div>
 
       <div className="fixed -top-32 -right-32 text-zinc-900/10 pointer-events-none z-0 overflow-hidden">
         <motion.div
           animate={{ 
-            y: [0, 50, 0],
+            y: [0, 40],
           }}
           transition={{ 
-            duration: 15, 
+            duration: 12, 
             repeat: Infinity, 
+            repeatType: "reverse",
             ease: "easeInOut" 
           }}
           style={{ willChange: 'transform' }}
+          className="hidden sm:block"
         >
           <LayoutDashboard size={600} strokeWidth={0.5} />
         </motion.div>
+        <div className="sm:hidden">
+          <LayoutDashboard size={250} strokeWidth={0.5} />
+        </div>
       </div>
 
       {/* Stats Overview */}
@@ -153,7 +163,11 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
           ))
         ) : (
           <>
-            <StatCard icon={<BookOpen size={24} />} label="Total Books" value={1} />
+            <StatCard 
+              icon={<img src="/logo.svg" alt="Books" className="h-6 w-6 object-contain" />} 
+              label="Total Books" 
+              value={books.length} 
+            />
             <StatCard icon={<TrendingUp size={24} />} label="Assessments" value={assessments.length} />
             <StatCard icon={<Users size={24} />} label="Evaluators" value={React.useMemo(() => new Set(assessments.map(a => a.userId)).size, [assessments])} />
             <StatCard icon={<ShieldCheck size={24} />} label="Security Level" value="Verified" />
@@ -184,6 +198,9 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
           </div>
         </div>
       </section>
+
+      {/* Evaluation Rating Trends */}
+      <RatingTrendsChart books={books} assessments={assessments} />
 
       {/* Recent Assessments List */}
       <section className="space-y-6">
@@ -247,22 +264,22 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
 
       {/* Main Content */}
       <section className="space-y-10">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-3">
-            <h2 className="text-4xl sm:text-5xl font-serif font-bold tracking-tight text-white">Resource Archive</h2>
-            <p className="text-zinc-400 font-light text-base sm:text-lg">Curated academic materials for professional assessment</p>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between w-full">
+          <div className="space-y-2">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif font-bold tracking-tight text-white">Resource Archive</h2>
+            <p className="text-zinc-400 font-light text-xs sm:text-base">Curated academic materials for professional assessment</p>
           </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
-            <div className="relative w-full sm:w-96">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
               <Input
-                placeholder="Search by title, author or ISBN..."
-                className="pl-12 h-14 bg-transparent border-noir-border/30 hover:border-cyan/40 text-white placeholder:text-zinc-500 rounded-2xl focus:ring-noir-border/50 transition-all font-medium"
+                placeholder="Search..."
+                className="pl-12 h-12 sm:h-14 bg-transparent border-noir-border/30 hover:border-cyan/40 text-white placeholder:text-zinc-500 rounded-2xl focus:ring-noir-border/50 transition-all font-medium text-sm"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <Button 
                 variant="outline" 
                 onClick={() => {
@@ -270,23 +287,23 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
                   setSelectedIds([]);
                 }} 
                 className={cn(
-                  "h-14 px-6 rounded-2xl border-noir-border/40 transition-all",
+                  "h-12 sm:h-14 px-4 sm:px-6 rounded-2xl border-noir-border/40 transition-all text-xs sm:text-sm font-bold flex-1 sm:flex-initial",
                   isSelectionMode ? "bg-noir-border/40 border-noir-border text-white" : "text-zinc-500 hover:bg-black/60"
                 )}
               >
-                {isSelectionMode ? "Cancel Selection" : "Select Multiple"}
+                {isSelectionMode ? "Cancel" : "Select"}
               </Button>
               {isSelectionMode && selectedIds.length > 0 && (
                 <Button 
                   variant="danger" 
                   onClick={handleBulkDeleteAction}
-                  className="h-14 px-6 rounded-2xl animate-in fade-in slide-in-from-right-4"
+                  className="h-12 sm:h-14 px-4 rounded-2xl text-xs sm:text-sm font-bold animate-in fade-in slide-in-from-right-4 flex-1 sm:flex-initial"
                 >
                   Trash ({selectedIds.length})
                 </Button>
               )}
-              <Button onClick={onAddBook} className="h-14 px-8 cyan-gradient text-white font-bold rounded-2xl gap-2 shadow-lg">
-                <Plus size={20} />
+              <Button onClick={onAddBook} className="h-12 sm:h-14 px-4 sm:px-8 cyan-gradient text-white font-bold rounded-2xl gap-2 shadow-lg text-xs sm:text-sm flex-1 sm:flex-initial justify-center">
+                <Plus size={18} />
                 Add Resource
               </Button>
             </div>
@@ -305,7 +322,7 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
                 key={f}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  "rounded-xl px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all border",
+                  "rounded-xl px-3 sm:px-6 py-2 sm:py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all border",
                   filter === f
                     ? "bg-noir-border text-white border-noir-border shadow-[0_0_20px_rgba(8,145,178,0.15)]"
                     : "bg-transparent text-zinc-400 border-noir-border/20 hover:border-cyan/40 hover:text-white transition-all"

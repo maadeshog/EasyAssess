@@ -4,10 +4,99 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EasyAssess | Quality Assessment Platform</title>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/logo.svg" color="#0891b2" />
+    <meta name="msapplication-TileImage" content="/android-chrome-192x192.png" />
+    <meta name="msapplication-TileColor" content="#020202" />
+    <meta property="og:title" content="EasyAssess | Quality Assessment Platform" />
+    <meta property="og:description" content="Professional quality assessment platform for academic resources." />
+    <meta property="og:image" content="/icon.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/icon.png" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#18181b" />
+    <meta name="theme-color" content="#020202" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <script>
+      // Clear buggy cached service worker intercepts immediately and trigger onetime secure reload
+      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          if (registrations.length > 0) {
+            console.log('Stale service workers found, purging and reloading securely...');
+            for (var i = 0; i < registrations.length; i++) {
+              registrations[i].unregister();
+            }
+            if (!sessionStorage.getItem('pwa-sw-clean-reload-v1')) {
+              sessionStorage.setItem('pwa-sw-clean-reload-v1', 'true');
+              window.location.reload();
+            }
+          }
+        }).catch(function(err) {
+          console.warn('SW cleanup warning:', err);
+        });
+      }
+
+      // Animation safety fallback
+      window.addEventListener('error', function(e) {
+        // Disable motion if an animation-related error occurs
+        if (e.message && (e.message.toLowerCase().includes('animation') || e.message.toLowerCase().includes('motion') || e.message.toLowerCase().includes('keyframes'))) {
+           document.documentElement.classList.add('no-animations');
+           console.warn('Animation engine failure detected, fallback to static mode.');
+        }
+
+        var errDiv = document.getElementById('fatal-browser-error-diagnostic');
+        if (!errDiv) {
+          errDiv = document.createElement('div');
+          errDiv.id = 'fatal-browser-error-diagnostic';
+          errDiv.className = 'error-diagnostic-overlay';
+          document.body.appendChild(errDiv);
+        }
+        errDiv.innerHTML = '<h2>Fatal App Initialization Crash Caught:</h2>' +
+          '<p style="color: #fca5a5; font-weight: bold;">' + e.message + '</p>' +
+          '<p style="color: #a1a1aa;">File: ' + e.filename + ':' + e.lineno + ':' + e.colno + '</p>' +
+          '<pre style="color: #fda4af; background: #1c1917; padding: 1rem; border-radius: 8px; border: 1px solid #7f1d1d; margin-top: 1rem; overflow-x: auto;">' + (e.error && e.error.stack ? e.error.stack : 'No stacktrace available') + '</pre>' +
+          '<button onClick="window.location.reload()" style="margin-top: 2rem; padding: 0.75rem 1.5rem; background: #7f1d1d; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Hard Refresh Platform</button>';
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var errDiv = document.getElementById('fatal-browser-error-diagnostic');
+        if (!errDiv) {
+          errDiv = document.createElement('div');
+          errDiv.id = 'fatal-browser-error-diagnostic';
+          errDiv.className = 'error-diagnostic-overlay';
+          document.body.appendChild(errDiv);
+        }
+        var reason = e.reason && (e.reason.message || e.reason);
+        var stack = e.reason && e.reason.stack;
+        errDiv.innerHTML = '<h2>Fatal Promise Rejection Crash Caught:</h2>' +
+          '<p style="color: #fca5a5; font-weight: bold;">' + reason + '</p>' +
+          '<pre style="color: #fda4af; background: #1c1917; padding: 1rem; border-radius: 8px; border: 1px solid #7f1d1d; margin-top: 1rem; overflow-x: auto;">' + (stack || 'No stacktrace available') + '</pre>' +
+          '<button onClick="window.location.reload()" style="margin-top: 2rem; padding: 0.75rem 1.5rem; background: #7f1d1d; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Hard Refresh Platform</button>';
+      });
+    </script>
+    <style>
+      .error-diagnostic-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        background: #0e0e11;
+        color: #ef4444;
+        padding: 2rem;
+        font-family: monospace;
+        overflow: auto;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .no-animations *, .no-animations *:before, .no-animations *:after {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

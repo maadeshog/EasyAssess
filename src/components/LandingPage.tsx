@@ -1,28 +1,38 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { BookOpen, CheckCircle2, Star, ShieldCheck, ArrowRight, Zap, Layers, Globe, Award, Home } from 'lucide-react';
+import { BookOpen, CheckCircle2, Star, ShieldCheck, ArrowRight, Zap, Layers, Globe, Award, Home, Download } from 'lucide-react';
 import { Button } from './ui';
 import { FeedbackSection } from './FeedbackSection';
 
-export const LandingPage: React.FC<{ onGetStarted: () => void }> = React.memo(({ onGetStarted }) => {
+export const LandingPage: React.FC<{ 
+  onGetStarted: () => void;
+  isInstallable: boolean;
+  onInstall: () => void;
+}> = React.memo(({ onGetStarted, isInstallable, onInstall }) => {
   return (
     <div className="relative space-y-32 pb-32">
       {/* Decorative Background Icon */}
-      <div className="fixed -bottom-24 -left-24 text-zinc-900/10 pointer-events-none z-0">
+      <div className="fixed -bottom-24 -left-24 text-zinc-900/10 pointer-events-none z-0 overflow-hidden hidden sm:block">
         <motion.div
           animate={{ 
-            rotate: [0, 5, -5, 0], // Reduced range for performance
-            scale: [1, 1.02, 1],
+            rotate: [0, 8],
+            scale: [1, 1.05],
           }}
           transition={{ 
-            duration: 30, // Slower is cheaper
+            duration: 20, 
             repeat: Infinity, 
+            repeatType: "reverse",
             ease: "linear" 
           }}
           style={{ willChange: 'transform' }}
+          className="opacity-10 grayscale"
         >
-          <Home size={600} />
+          <img src="/logo.svg" alt="" className="w-[600px] h-[600px] object-contain" />
         </motion.div>
+      </div>
+
+      <div className="fixed -bottom-10 -left-10 text-zinc-900/5 pointer-events-none z-0 overflow-hidden sm:hidden">
+        <img src="/logo.svg" alt="" className="w-[250px] h-[250px] object-contain opacity-10 grayscale" />
       </div>
 
       {/* Hero Section */}
@@ -44,35 +54,45 @@ export const LandingPage: React.FC<{ onGetStarted: () => void }> = React.memo(({
               <ShieldCheck size={14} />
               Verified Academic Standards
             </div>
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-serif font-bold tracking-tight text-white leading-[0.9]">
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-serif font-bold tracking-tight text-white leading-[1] md:leading-[0.9]">
               <span 
-                className="inline-block text-transparent bg-clip-text bg-[linear-gradient(110deg,#0ea5e9,45%,#fff,55%,#0ea5e9)] bg-[length:200%_100%] animate-shimmer italic pb-4 md:pb-0"
+                className="inline-block text-transparent bg-clip-text bg-[linear-gradient(110deg,#0ea5e9,45%,#fff,55%,#0ea5e9)] bg-[length:200%_100%] animate-shimmer italic pb-2 md:pb-0"
               >
                 EasyAssess
               </span> supports fast review of the book <span className="text-white">Quality</span>
             </h1>
-            <p className="max-w-xl text-xl leading-relaxed text-zinc-500 font-light">
+            <p className="max-w-xl text-base sm:text-xl leading-relaxed text-zinc-500 font-light">
               EasyAssess provides a prestigious framework for the rigorous evaluation of textbooks and academic resources. 
               Powered by verified peer-review metrics and global pedagogical standards.
             </p>
-            <div className="flex flex-wrap gap-6 pt-4">
+            <div className="flex flex-wrap gap-4 sm:gap-6 pt-2">
               <Button 
                 size="lg" 
                 onClick={onGetStarted} 
-                className="relative group h-16 px-12 rounded-full overflow-hidden transition-all duration-500 hover:scale-105 active:scale-95"
+                className="relative group h-14 sm:h-16 px-8 sm:px-12 rounded-full overflow-hidden transition-all duration-500 hover:scale-105 active:scale-95 bg-noir-border"
               >
-                {/* Aesthetic Glow Layers */}
-                <div className="absolute inset-0 cyan-gradient opacity-100 group-hover:opacity-90 transition-opacity"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_70%)] from-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
                 {/* Outer Glow */}
                 <div className="absolute -inset-1 cyan-gradient blur-2xl opacity-40 group-hover:opacity-70 transition-opacity duration-500"></div>
                 
-                <span className="relative z-10 flex items-center gap-3 text-white font-bold text-lg tracking-wide">
+                <span className="relative z-10 flex items-center gap-3 text-white font-bold text-sm sm:text-lg tracking-wide uppercase">
                   Get Started
-                  <ArrowRight size={22} className="transition-transform duration-500 group-hover:translate-x-2" />
+                  <ArrowRight size={20} className="transition-transform duration-500 group-hover:translate-x-2" />
                 </span>
               </Button>
+
+              {isInstallable && (
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={onInstall}
+                  className="relative group h-14 sm:h-16 px-8 sm:px-12 rounded-full overflow-hidden transition-all duration-500 hover:scale-105 active:scale-95 border-zinc-800 bg-black/40 hover:border-cyan/50 backdrop-blur-xl"
+                >
+                  <span className="relative z-10 flex items-center gap-3 text-zinc-300 font-bold text-sm sm:text-lg tracking-wide group-hover:text-cyan transition-colors">
+                    <Download size={20} />
+                    Install Platform
+                  </span>
+                </Button>
+              )}
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8 pt-6">
               <div className="flex -space-x-4">
@@ -314,13 +334,13 @@ export const LandingPage: React.FC<{ onGetStarted: () => void }> = React.memo(({
 
       {/* Trust Section */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
-        <div className="rounded-[32px] sm:rounded-[40px] glass-panel p-8 sm:p-16 text-center space-y-12">
-          <h3 className="text-2xl font-serif font-bold text-white">Trusted by Leading Institutions</h3>
-          <div className="flex flex-wrap justify-center gap-16 opacity-40 grayscale hover:grayscale-0 transition-all">
-            <div className="text-3xl font-serif font-bold text-white">OXFORD</div>
-            <div className="text-3xl font-serif font-bold text-white">CAMBRIDGE</div>
-            <div className="text-3xl font-serif font-bold text-white">HARVARD</div>
-            <div className="text-3xl font-serif font-bold text-white">STANFORD</div>
+        <div className="rounded-[32px] sm:rounded-[40px] glass-panel p-6 sm:p-16 text-center space-y-8 sm:space-y-12">
+          <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">Trusted by Leading Institutions</h3>
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-16 opacity-40 grayscale hover:grayscale-0 transition-all">
+            <div className="text-xl sm:text-3xl font-serif font-bold text-white">OXFORD</div>
+            <div className="text-xl sm:text-3xl font-serif font-bold text-white">CAMBRIDGE</div>
+            <div className="text-xl sm:text-3xl font-serif font-bold text-white">HARVARD</div>
+            <div className="text-xl sm:text-3xl font-serif font-bold text-white">STANFORD</div>
           </div>
         </div>
       </section>
@@ -329,19 +349,19 @@ export const LandingPage: React.FC<{ onGetStarted: () => void }> = React.memo(({
       <FeedbackSection />
 
       {/* CTA Section */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 pb-20">
-        <div className="relative overflow-hidden rounded-[32px] sm:rounded-[40px] cyan-gradient p-8 sm:p-16 text-center space-y-10 shadow-[0_0_50px_rgba(8,145,178,0.15)]">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 pb-10 sm:pb-20">
+        <div className="relative overflow-hidden rounded-[32px] sm:rounded-[40px] cyan-gradient p-6 sm:p-16 text-center space-y-8 sm:space-y-10 shadow-[0_0_50px_rgba(8,145,178,0.15)]">
           <div className="absolute inset-0 bg-transparent backdrop-blur-sm"></div>
           <div className="relative z-10 space-y-6">
-            <h2 className="text-4xl font-serif font-bold text-white md:text-6xl">Ready to set the standard?</h2>
-            <p className="mx-auto max-w-2xl text-lg text-zinc-400 font-light">
+            <h2 className="text-3xl font-serif font-bold text-white sm:text-4xl md:text-6xl">Ready to set the standard?</h2>
+            <p className="mx-auto max-w-2xl text-sm sm:text-lg text-zinc-400 font-light">
               Join our global network of verified academic evaluators and contribute to the most prestigious resource archive in the world.
             </p>
-            <div className="pt-6">
+            <div className="pt-4 sm:pt-6">
               <Button 
                 size="lg" 
                 onClick={onGetStarted} 
-                className="relative group h-16 px-12 rounded-full overflow-hidden bg-noir-border transition-all duration-500 hover:scale-105 active:scale-95"
+                className="relative group h-14 sm:h-16 px-8 sm:px-12 rounded-full overflow-hidden bg-noir-border transition-all duration-500 hover:scale-105 active:scale-95"
               >
                 {/* Inner Glow */}
                 <div className="absolute inset-0 bg-noir-border/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -349,7 +369,7 @@ export const LandingPage: React.FC<{ onGetStarted: () => void }> = React.memo(({
                 {/* Outer Glow */}
                 <div className="absolute -inset-2 bg-noir-border/30 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
-                <span className="relative z-10 text-white font-bold text-lg">
+                <span className="relative z-10 text-white font-bold text-sm sm:text-lg">
                   Join the Archive
                 </span>
               </Button>

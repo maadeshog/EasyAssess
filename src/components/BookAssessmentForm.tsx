@@ -84,8 +84,8 @@ export const BookAssessmentForm: React.FC<BookAssessmentFormProps> = ({ bookTitl
           <ShieldCheck size={14} />
           Verified Evaluation Protocol
         </div>
-        <h2 className="text-4xl sm:text-5xl font-serif font-bold text-white tracking-tight">Quality Assessment</h2>
-        <p className="text-zinc-400 font-light text-base sm:text-lg">Evaluating: <span className="text-zinc-400 font-medium italic">"{bookTitle}"</span></p>
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif font-bold text-white tracking-tight">Quality Assessment</h2>
+        <p className="text-zinc-400 font-light text-sm sm:text-lg">Evaluating: <span className="text-zinc-400 font-medium italic">"{bookTitle}"</span></p>
       </div>
 
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-10">
@@ -114,19 +114,19 @@ export const BookAssessmentForm: React.FC<BookAssessmentFormProps> = ({ bookTitl
           <label className="text-xs font-bold uppercase tracking-widest text-zinc-400">Evaluator Comments</label>
           <textarea
             {...register('comments')}
-            rows={6}
+            rows={5}
             placeholder="Provide a detailed academic critique..."
-            className="w-full rounded-[32px] border border-noir-border/40 bg-black/60 p-8 text-white placeholder:text-zinc-700 focus:ring-2 focus:ring-noir-border/50 outline-none transition-all"
+            className="w-full rounded-[24px] sm:rounded-[32px] border border-noir-border/40 bg-black/60 p-4 sm:p-8 text-white placeholder:text-zinc-700 focus:ring-2 focus:ring-noir-border/50 outline-none transition-all text-sm"
           />
           {errors.comments && <p className="text-xs font-bold text-red-500 uppercase tracking-widest flex items-center gap-2"><AlertCircle size={12} /> {errors.comments.message}</p>}
         </div>
 
-        <div className="flex gap-6 pt-8">
-          <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-16 rounded-2xl border-noir-border/40 text-zinc-500 hover:bg-black/60">
-            Discard Assessment
+        <div className="flex gap-4 sm:gap-6 pt-6 sm:pt-8">
+          <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-12 sm:h-16 rounded-2xl border-noir-border/40 text-zinc-500 hover:bg-black/60 text-xs sm:text-base font-bold">
+            Discard
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="flex-1 h-16 rounded-2xl cyan-gradient text-white font-bold text-lg shadow-xl gap-3">
-            <Send size={20} />
+          <Button type="submit" disabled={isSubmitting} className="flex-1 h-12 sm:h-16 rounded-2xl cyan-gradient text-white font-bold text-xs sm:text-lg shadow-xl gap-2 sm:gap-3 justify-center">
+            <Send size={16} />
             {isSubmitting ? 'Submitting...' : 'Submit Evaluation'}
           </Button>
         </div>
@@ -136,7 +136,7 @@ export const BookAssessmentForm: React.FC<BookAssessmentFormProps> = ({ bookTitl
 };
 
 const RatingSlider = ({ label, value, onChange }: { label: string; value: number; onChange: (val: number) => void }) => (
-  <div className="glass-panel rounded-[32px] p-8 space-y-6 transition-all hover:bg-black/80">
+  <div className="glass-panel rounded-[24px] sm:rounded-[32px] p-5 sm:p-8 space-y-4 sm:space-y-6 transition-all hover:bg-black/80">
     <div className="flex items-center justify-between">
       <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">{label}</span>
       <span className="text-3xl font-serif font-bold text-white">{value}</span>

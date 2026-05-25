@@ -98,43 +98,43 @@ export const BookDetails: React.FC<BookDetailsProps> = ({ book, assessments, onB
                   Verified Entry
                 </div>
               </div>
-              <h1 className="font-serif text-5xl font-bold tracking-tight text-white leading-tight">{book.title}</h1>
-              <div className="flex items-center gap-3 text-xl font-medium text-zinc-500">
-                <User size={20} className="text-cyan" />
+              <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">{book.title}</h1>
+              <div className="flex items-center gap-3 text-base sm:text-xl font-medium text-zinc-500">
+                <User size={18} className="text-cyan" />
                 <span>{book.author}</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 py-8 border-y border-noir-border/20">
+            <div className="grid grid-cols-2 gap-4 sm:gap-8 py-6 sm:py-8 border-y border-noir-border/20">
               <div className="space-y-1">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Publication</div>
-                <div className="flex items-center gap-2 text-white font-medium">
+                <div className="flex items-center gap-2 text-white font-medium text-sm sm:text-base">
                   <Calendar size={16} className="text-cyan/50" />
                   <span>{book.year}</span>
                 </div>
               </div>
               <div className="space-y-1">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Publisher</div>
-                <div className="flex items-center gap-2 text-white font-medium">
+                <div className="flex items-center gap-2 text-white font-medium text-sm sm:text-base">
                   <Tag size={16} className="text-cyan/50" />
                   <span>{book.publisher}</span>
                 </div>
               </div>
               <div className="space-y-1">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Acquisition Source</div>
-                <div className="flex items-center gap-2 text-white font-medium">
+                <div className="flex items-center gap-2 text-white font-medium text-sm sm:text-base">
                   <ShieldCheck size={16} className="text-cyan/50" />
                   <span>{book.source || "Verified Archive"}</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-widest text-cyan">Abstract</h4>
-              <p className="text-zinc-500 leading-relaxed font-light text-lg italic">"{book.description || "No description provided."}"</p>
+              <p className="text-zinc-500 leading-relaxed font-light text-sm sm:text-lg italic">"{book.description || "No description provided."}"</p>
             </div>
 
-            <Button size="lg" className="w-full h-16 rounded-2xl cyan-gradient text-white font-bold text-lg shadow-xl" onClick={() => onAssess(book)}>
+            <Button size="lg" className="w-full h-14 sm:h-16 rounded-2xl cyan-gradient text-white font-bold text-sm sm:text-lg shadow-xl" onClick={() => onAssess(book)}>
               Initiate Quality Assessment
             </Button>
           </div>

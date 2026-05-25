@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { Mail, Lock, LogIn, UserPlus, Phone, BookOpen } from 'lucide-react';
 import { Button, Input } from './ui';
 import { auth } from '../firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signInWithPopup, signInWithRedirect, GoogleAuthProvider, sendPasswordResetEmail } from 'firebase/auth';
 
 export const LoginPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,13 +22,17 @@ export const LoginPage: React.FC = () => {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
     } catch (err: any) {
-      console.error(err);
+      console.warn('Popup authentication style blocked/unsupported. Attempting fallback redirect...', err);
       if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
-        // Ignore
-      } else if (err.code === 'auth/popup-blocked') {
-        setError("The login popup was blocked by your browser. Please allow popups for this site and try again.");
-      } else {
-        setError(err.message || 'Google authentication failed.');
+        setIsLoading(false);
+        return;
+      }
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithRedirect(auth, provider);
+      } catch (redirectErr: any) {
+        console.error('Redirect sign-in also failed:', redirectErr);
+        setError("Your mobile web-view or frame is restricting popup capabilities. Please authenticate utilizing standard Email/Password.");
       }
     } finally {
       setIsLoading(false);
@@ -108,13 +112,18 @@ export const LoginPage: React.FC = () => {
             <div className="flex items-center gap-4 mb-10">
               <motion.div 
                 animate={{ 
-                  y: [0, -6, 0],
-                  filter: ["drop-shadow(0 0 15px rgba(8,145,178,0.3))", "drop-shadow(0 0 40px rgba(8,145,178,0.7))", "drop-shadow(0 0 15px rgba(8,145,178,0.3))"]
+                  y: [0, -8],
+                  filter: ["drop-shadow(0 0 15px rgba(8,145,178,0.2))", "drop-shadow(0 0 35px rgba(8,145,178,0.6))"]
                 }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="h-16 w-16 rounded-full cyan-gradient flex items-center justify-center text-white border border-white/10"
+                transition={{ 
+                  duration: 4, 
+                  repeat: Infinity, 
+                  repeatType: "reverse",
+                  ease: "easeInOut" 
+                }}
+                className="h-16 w-16 rounded-[24%] bg-[#020202] flex items-center justify-center text-white border border-white/10 overflow-hidden shadow-[0_4px_15px_rgba(8,145,178,0.3)]"
               >
-                <BookOpen size={32} />
+                <img src="/logo.svg" alt="EasyAssess Logo" className="h-12 w-12 object-contain" />
               </motion.div>
               <motion.span 
                 initial={{ backgroundPosition: "200% 0" }}
@@ -152,13 +161,18 @@ export const LoginPage: React.FC = () => {
             <div className="flex flex-col items-center gap-4 mb-6">
               <motion.div 
                 animate={{ 
-                  scale: [1, 1.05, 1],
-                  filter: ["drop-shadow(0 0 20px rgba(8,145,178,0.4))", "drop-shadow(0 0 50px rgba(8,145,178,0.8))", "drop-shadow(0 0 20px rgba(8,145,178,0.4))"]
+                  scale: [1, 1.08],
+                  filter: ["drop-shadow(0 0 20px rgba(8,145,178,0.3))", "drop-shadow(0 0 45px rgba(8,145,178,0.7))"]
                 }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="h-20 w-20 rounded-full cyan-gradient flex items-center justify-center text-white border border-white/10"
+                transition={{ 
+                  duration: 5, 
+                  repeat: Infinity, 
+                  repeatType: "reverse",
+                  ease: "easeInOut" 
+                }}
+                className="h-20 w-20 rounded-[24%] bg-[#020202] flex items-center justify-center text-white border border-white/10 overflow-hidden shadow-[0_5px_20px_rgba(8,145,178,0.4)]"
               >
-                <BookOpen size={40} />
+                <img src="/logo.svg" alt="EasyAssess Logo" className="h-14 w-14 object-contain" />
               </motion.div>
               <motion.span 
                 initial={{ backgroundPosition: "200% 0" }}
@@ -218,9 +232,9 @@ export const LoginPage: React.FC = () => {
                   <motion.div 
                     animate={{ rotate: 360 }}
                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center h-6 w-6"
                   >
-                    <BookOpen size={24} />
+                    <img src="/logo.svg" alt="Loading" className="h-full w-full object-contain" />
                   </motion.div>
                 ) : (
                   'Send Reset Link'
@@ -315,9 +329,9 @@ export const LoginPage: React.FC = () => {
                     <motion.div 
                       animate={{ rotate: 360 }}
                       transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      className="flex items-center justify-center"
+                      className="flex items-center justify-center h-6 w-6"
                     >
-                      <BookOpen size={24} />
+                      <img src="/logo.svg" alt="Loading" className="h-full w-full object-contain" />
                     </motion.div>
                   ) : (
                     <div className="flex items-center justify-center gap-2">

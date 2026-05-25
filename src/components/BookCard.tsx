@@ -110,9 +110,9 @@ export const BookCard: React.FC<BookCardProps> = React.memo(({
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col p-8">
-          <div className="mb-6 space-y-2">
-            <h3 className="line-clamp-2 font-serif text-2xl font-bold text-white leading-tight group-hover:text-white transition-colors">
+        <div className="flex flex-1 flex-col p-5 sm:p-8">
+          <div className="mb-4 sm:mb-6 space-y-2">
+            <h3 className="line-clamp-2 font-serif text-xl sm:text-2xl font-bold text-white leading-tight group-hover:text-white transition-colors">
               {book.title}
             </h3>
             <div className="flex flex-col gap-1">
@@ -127,7 +127,7 @@ export const BookCard: React.FC<BookCardProps> = React.memo(({
             </div>
           </div>
 
-          <div className="mt-auto space-y-6">
+          <div className="mt-auto space-y-4 sm:space-y-6">
             <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-zinc-500">
               <div className="flex items-center gap-2">
                 <Calendar size={12} />

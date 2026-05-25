@@ -1,21 +1,80 @@
 {
-  "name": "EasyAssess Quality Platform",
+  "id": "/?utm_source=pwa",
+  "name": "EasyAssess Platform",
   "short_name": "EasyAssess",
-  "description": "Professional quality assessment platform for academic resources.",
-  "start_url": "/",
+  "description": "Next-Gen Academic Assessment & Review Engine",
+  "start_url": "/?utm_source=pwa",
   "display": "standalone",
-  "background_color": "#f9fafb",
-  "theme_color": "#18181b",
+  "background_color": "#020202",
+  "theme_color": "#020202",
+  "orientation": "any",
+  "categories": [
+    "education",
+    "utilities",
+    "productivity"
+  ],
   "icons": [
     {
-      "src": "https://picsum.photos/seed/biblio/192/192",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "https://picsum.photos/seed/biblio/512/512",
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "EasyAssess Academic Rating Dashboard"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "EasyAssess Mobile Book Review Portal"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Go to academic book evaluation dashboard",
+      "url": "/?shortcut=dashboard",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "description": "Adjust assessment criteria settings",
+      "url": "/?shortcut=settings",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
     }
   ]
 }
