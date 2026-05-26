@@ -51,31 +51,31 @@ export default defineConfig(({mode}) => {
           ],
           icons: [
             {
-              src: './android-chrome-192x192.png',
+              src: '/android-chrome-192x192.png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any'
             },
             {
-              src: './android-chrome-512x512.png',
+              src: '/android-chrome-512x512.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any'
             },
             {
-              src: './android-chrome-192x192.png',
+              src: '/android-chrome-192x192.png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'maskable'
             },
             {
-              src: './logo.svg',
+              src: '/logo.svg',
               sizes: 'any',
               type: 'image/svg+xml',
               purpose: 'any'
             },
             {
-              src: './logo.svg',
+              src: '/logo.svg',
               sizes: 'any',
               type: 'image/svg+xml',
               purpose: 'maskable'
@@ -83,14 +83,14 @@ export default defineConfig(({mode}) => {
           ],
           screenshots: [
             {
-              src: './screenshot-desktop.png',
+              src: '/screenshot-desktop.png',
               sizes: '1408x768',
               type: 'image/png',
               form_factor: 'wide',
               label: 'EasyAssess Academic Rating Dashboard'
             },
             {
-              src: './screenshot-mobile.png',
+              src: '/screenshot-mobile.png',
               sizes: '768x1376',
               type: 'image/png',
               form_factor: 'narrow',
@@ -103,14 +103,14 @@ export default defineConfig(({mode}) => {
               short_name: 'Dashboard',
               description: 'Go to academic book evaluation dashboard',
               url: '/?shortcut=dashboard',
-              icons: [{ 'src': './android-chrome-192x192.png', 'sizes': '192x192', 'type': 'image/png' }]
+              icons: [{ 'src': '/android-chrome-192x192.png', 'sizes': '192x192', 'type': 'image/png' }]
             },
             {
               name: 'Settings',
               short_name: 'Settings',
               description: 'Adjust academic assessment settings',
               url: '/?shortcut=settings',
-              icons: [{ 'src': './android-chrome-192x192.png', 'sizes': '192x192', 'type': 'image/png' }]
+              icons: [{ 'src': '/android-chrome-192x192.png', 'sizes': '192x192', 'type': 'image/png' }]
             }
           ]
         },
