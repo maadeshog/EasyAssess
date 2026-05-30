@@ -18,7 +18,8 @@
         "updatedAt": { "type": "number", "description": "Last update timestamp" },
         "createdBy": { "type": "string", "description": "UID of the user who added the book" },
         "status": { "type": "string", "enum": ["active", "trashed"], "description": "Status of the resource" },
-        "deletedAt": { "type": "number", "description": "Timestamp when the resource was moved to trash" }
+        "deletedAt": { "type": "number", "description": "Timestamp when the resource was moved to trash" },
+        "language": { "type": "string", "description": "Preferred or native language of the resource" }
       },
       "required": ["title", "author", "isbn", "publisher", "year", "type", "createdAt", "updatedAt", "createdBy", "status"]
     },
@@ -58,9 +59,10 @@
         "email": { "type": "string", "description": "User email address" },
         "displayName": { "type": "string", "description": "User display name" },
         "role": { "type": "string", "enum": ["admin", "evaluator"], "description": "User role" },
-        "createdAt": { "type": "number", "description": "Creation timestamp" }
+        "createdAt": { "type": "number", "description": "Creation timestamp" },
+        "language": { "type": "string", "description": "Preferred language of the user for AI localized interactions" }
       },
-      "required": ["uid", "email", "displayName", "role", "createdAt"]
+      "required": ["uid", "displayName", "role", "createdAt"]
     },
     "Feedback": {
       "title": "Feedback",

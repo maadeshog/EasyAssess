@@ -641,6 +641,8 @@ export default function App() {
                   >
                     <BookAssessmentForm
                       bookTitle={selectedBook.title}
+                      bookLanguage={selectedBook.language}
+                      userLanguage={user?.language}
                       onCancel={() => setView('landing')}
                       onSubmit={handleSubmitAssessment}
                     />
@@ -738,6 +740,7 @@ export default function App() {
                       books={books}
                       assessments={assessments}
                       onBack={() => setView('landing')}
+                      currentUser={user}
                     />
                   </motion.div>
                 )}

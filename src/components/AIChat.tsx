@@ -4,7 +4,7 @@ import { Send, Bot, User, Loader2, Sparkles, BookOpen, Trash2, Mic, MicOff, Sear
 import { GoogleGenAI } from "@google/genai";
 import { Button, Input } from './ui';
 import { cn } from '@/src/lib/utils';
-import { Book, Assessment } from '../types';
+import { Book, Assessment, UserProfile } from '../types';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,9 +15,10 @@ interface AIChatProps {
   books: Book[];
   assessments: Assessment[];
   onBack: () => void;
+  currentUser?: UserProfile | null;
 }
 
-export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, onBack }) => {
+export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, onBack, currentUser }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -107,22 +108,26 @@ export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, o
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       
+      const userLang = currentUser?.language || "English";
       const context = `
         You are the EasyAssess AI Assistant. You have access to the user's academic archive.
+        The current evaluator's preferred language is ${userLang}. Always prioritize converse, suggestions, rubrics translation, and feedback explanations in ${userLang}.
+        If the evaluator asks about textbooks or assessments, proactively suggest translated rubrics, localized study criteria, or conduct the chat sessions in ${userLang}.
+
         Current Stats:
         - Total Books: ${books.length}
         - Total Assessments: ${assessments.length}
         
-        Archive Contents:
-        ${books.map(b => `- ${b.title} by ${b.author} (${b.type})`).join('\n')}
+        Archive Contents (include study language information if present):
+        ${books.map(b => `- ${b.title} by ${b.author} (${b.type}, Language: ${b.language || 'English'})`).join('\n')}
         
         Recent Assessments:
         ${assessments.slice(0, 5).map(a => {
           const book = books.find(b => b.id === a.bookId);
-          return `- Assessment for "${book?.title}" by ${a.userName}: ${a.recommendation}`;
+          return `- Assessment for "${book?.title}" by ${a.userName}: ${a.recommendation} (Comments: ${a.comments})`;
         }).join('\n')}
 
-        Be professional, academic, and helpful. If asked about a specific book, use this context.
+        Be professional, academic, helpful, and localized to the preferred language. If asked about a specific book, use this context.
       `;
 
       const response = await ai.models.generateContent({
@@ -136,7 +141,7 @@ export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, o
           { role: 'user', parts: [{ text: input }] }
         ],
         config: {
-          systemInstruction: "You are the EasyAssess AI Assistant. Provide professional guidance on academic resources and assessment results.",
+          systemInstruction: `You are the EasyAssess AI Assistant. Provide professional guidance on academic resources and assessment results. The evaluator's preferred language is ${userLang} — proactively localized and translate rubrics, suggest localized assessment parameters or study criteria, and talk in ${userLang} as appropriate.`,
         }
       });
 

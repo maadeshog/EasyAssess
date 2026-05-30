@@ -17,6 +17,7 @@ interface SettingsPageProps {
 export const SettingsPage: React.FC<SettingsPageProps> = ({ user, onBack, onUpdateUser }) => {
   const [displayName, setDisplayName] = useState(user.displayName);
   const [photoURL, setPhotoURL] = useState(user.photoURL || '');
+  const [language, setLanguage] = useState(user.language || 'English');
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
   });
@@ -33,6 +34,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ user, onBack, onUpda
       const updates = {
         displayName,
         photoURL: photoURL || null,
+        language,
       };
       
       localStorage.setItem('theme', theme);
@@ -161,6 +163,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ user, onBack, onUpda
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Enter your name"
+                className="bg-black/40 border-noir-border/20 text-white h-14 rounded-2xl"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 ml-1">Preferred Language</label>
+              <Input
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                placeholder="e.g. English, Spanish, Tamil, Hindi, French"
                 className="bg-black/40 border-noir-border/20 text-white h-14 rounded-2xl"
               />
             </div>

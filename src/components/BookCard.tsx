@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Book as BookIcon, User, Calendar, Tag, Star, ChevronRight, Award, Trash2, Hash, ShieldCheck } from 'lucide-react';
+import { Book as BookIcon, User, Calendar, Tag, Star, ChevronRight, Award, Trash2, Hash, ShieldCheck, Globe } from 'lucide-react';
 import { Book } from '@/src/types';
 import { Button } from './ui';
 import { cn } from '@/src/lib/utils';
@@ -43,7 +43,7 @@ export const BookCard: React.FC<BookCardProps> = React.memo(({
             : "border-noir-border/40 bg-black/40 hover:border-noir-border/60 hover:bg-black/50 hover:shadow-[0_0_20px_rgba(8,145,178,0.05)]"
           : "border-noir-border/40 bg-black/40 hover:border-noir-border/80 hover:bg-black/60 hover:shadow-[0_10px_40px_rgba(8,145,178,0.08)]"
       )}>
-        <div className="relative aspect-[2/3] overflow-hidden bg-black/60">
+        <div className="relative aspect-[2/3] overflow-hidden bg-black/60 transition-all duration-300 ring-0 ring-cyan-500/0 group-hover:ring-2 group-hover:ring-cyan-500/40 group-hover:shadow-[0_0_25px_rgba(6,182,212,0.25)]">
           {isSelectionMode && (
             <div className="absolute left-6 top-6 z-20">
               <div className={cn(
@@ -107,6 +107,12 @@ export const BookCard: React.FC<BookCardProps> = React.memo(({
               <ShieldCheck size={10} />
               Screened
             </div>
+            {book.language && (
+              <div className="rounded-full bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 px-3 py-1 text-[8px] font-bold uppercase tracking-widest text-cyan-400 flex items-center gap-1.5">
+                <Globe size={10} />
+                {book.language}
+              </div>
+            )}
           </div>
         </div>
 

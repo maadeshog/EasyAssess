@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { BarChart3, TrendingUp, Users, BookOpen, Search, Filter, Plus, ShieldCheck, ArrowUpDown, X, Zap, LayoutDashboard, Home, Star, ArrowLeft } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, BookOpen, Search, Filter, Plus, ShieldCheck, ArrowUpDown, X, Zap, LayoutDashboard, Home, Star, ArrowLeft, Globe } from 'lucide-react';
 import { Book, Assessment, UserProfile } from '@/src/types';
 import { BookCard } from './BookCard';
 import { Button, Input, Card, Skeleton } from './ui';
@@ -23,6 +23,7 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessments, onAssess, onAddBook, onViewBook, onDeleteBook, onBulkDelete, onBack, currentUser, isLoading }) => {
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState<'all' | 'textbook' | 'reference' | 'ebook'>('all');
+  const [langFilter, setLangFilter] = React.useState<string>('all');
   const [sortBy, setSortBy] = React.useState<'newest' | 'rating' | 'title' | 'year-asc' | 'year-desc'>('newest');
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = React.useState(false);
@@ -45,6 +46,16 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
     return ratings;
   }, [books, assessments]);
 
+  const availableLanguages = React.useMemo(() => {
+    const langs = new Set<string>();
+    books.forEach(book => {
+      if (book.language) {
+        langs.add(book.language);
+      }
+    });
+    return Array.from(langs).sort();
+  }, [books]);
+
   const filteredBooks = React.useMemo(() => books
     .filter(book => book.status === 'active' || !book.status) // Fallback for old books
     .filter(book => {
@@ -52,7 +63,8 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
                            book.author.toLowerCase().includes(search.toLowerCase()) ||
                            book.isbn.toLowerCase().includes(search.toLowerCase());
       const matchesFilter = filter === 'all' || book.type === filter;
-      return matchesSearch && matchesFilter;
+      const matchesLang = langFilter === 'all' || book.language === langFilter;
+      return matchesSearch && matchesFilter && matchesLang;
     })
     .sort((a, b) => {
       if (sortBy === 'newest') return b.createdAt - a.createdAt;
@@ -63,9 +75,9 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
         return bookRatings[b.id] - bookRatings[a.id];
       }
       return 0;
-    }), [books, search, filter, sortBy, bookRatings]);
+    }), [books, search, filter, langFilter, sortBy, bookRatings]);
 
-  const isFiltered = search !== '' || filter !== 'all';
+  const isFiltered = search !== '' || filter !== 'all' || langFilter !== 'all';
 
   const toggleSelection = React.useCallback((id: string) => {
     setSelectedIds(prev => 
@@ -333,7 +345,7 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
             ))}
             {isFiltered && (
               <button 
-                onClick={() => { setSearch(''); setFilter('all'); }}
+                onClick={() => { setSearch(''); setFilter('all'); setLangFilter('all'); }}
                 className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:bg-red-400/10 transition-colors"
               >
                 <X size={12} />
@@ -342,22 +354,41 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
             )}
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              <ArrowUpDown size={12} />
-              Sort By
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                <Globe size={12} className="text-cyan animate-pulse" />
+                Language
+              </div>
+              <select
+                value={langFilter}
+                onChange={(e) => setLangFilter(e.target.value)}
+                className="h-11 rounded-xl border border-noir-border/20 bg-black/40 px-4 text-[10px] font-bold uppercase tracking-widest text-zinc-400 outline-none focus:ring-1 focus:ring-noir-border/50 hover:border-cyan/40 transition-all cursor-pointer"
+              >
+                <option value="all" className="bg-dark-surface text-white">All Languages</option>
+                {availableLanguages.map(lang => (
+                  <option key={lang} value={lang} className="bg-dark-surface text-white">{lang}</option>
+                ))}
+              </select>
             </div>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="h-11 rounded-xl border border-noir-border/20 bg-transparent px-4 text-[10px] font-bold uppercase tracking-widest text-zinc-500 outline-none focus:ring-1 focus:ring-noir-border/50 hover:border-cyan/40 transition-all"
-            >
-              <option value="newest" className="bg-dark-surface text-white">Newest First</option>
-              <option value="rating" className="bg-dark-surface text-white">Highest Rated</option>
-              <option value="title" className="bg-dark-surface text-white">Title A-Z</option>
-              <option value="year-asc" className="bg-dark-surface text-white">Year (Oldest)</option>
-              <option value="year-desc" className="bg-dark-surface text-white">Year (Newest)</option>
-            </select>
+
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                <ArrowUpDown size={12} />
+                Sort By
+              </div>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="h-11 rounded-xl border border-noir-border/20 bg-black/40 px-4 text-[10px] font-bold uppercase tracking-widest text-zinc-500 outline-none focus:ring-1 focus:ring-noir-border/50 hover:border-cyan/40 transition-all cursor-pointer"
+              >
+                <option value="newest" className="bg-dark-surface text-white">Newest First</option>
+                <option value="rating" className="bg-dark-surface text-white">Highest Rated</option>
+                <option value="title" className="bg-dark-surface text-white">Title A-Z</option>
+                <option value="year-asc" className="bg-dark-surface text-white">Year (Oldest)</option>
+                <option value="year-desc" className="bg-dark-surface text-white">Year (Newest)</option>
+              </select>
+            </div>
           </div>
         </div>
 

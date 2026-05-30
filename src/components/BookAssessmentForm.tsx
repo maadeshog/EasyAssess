@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Star, Send, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Star, Send, ShieldCheck, AlertCircle, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Button, Input, Card } from './ui';
 import { cn } from '@/src/lib/utils';
 import confetti from 'canvas-confetti';
@@ -23,11 +23,17 @@ type AssessmentFormValues = z.infer<typeof assessmentSchema>;
 
 interface BookAssessmentFormProps {
   bookTitle: string;
+  bookLanguage?: string;
+  userLanguage?: string;
   onSubmit: (data: AssessmentFormValues) => void;
   onCancel: () => void;
 }
 
-export const BookAssessmentForm: React.FC<BookAssessmentFormProps> = ({ bookTitle, onSubmit, onCancel }) => {
+export const BookAssessmentForm: React.FC<BookAssessmentFormProps> = ({ bookTitle, bookLanguage, userLanguage, onSubmit, onCancel }) => {
+  const targetUserLang = userLanguage || 'English';
+  const targetBookLang = bookLanguage || 'English';
+  const isMatch = targetUserLang.toLowerCase().trim() === targetBookLang.toLowerCase().trim();
+
   const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<AssessmentFormValues>({
     resolver: zodResolver(assessmentSchema),
     defaultValues: {
@@ -86,6 +92,21 @@ export const BookAssessmentForm: React.FC<BookAssessmentFormProps> = ({ bookTitl
         </div>
         <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif font-bold text-white tracking-tight">Quality Assessment</h2>
         <p className="text-zinc-400 font-light text-sm sm:text-lg">Evaluating: <span className="text-zinc-400 font-medium italic">"{bookTitle}"</span></p>
+
+        {/* Smart Language-Match Indicator */}
+        <div className="flex justify-center mt-3">
+          {isMatch ? (
+            <div className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 text-xs font-semibold text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.05)]">
+              <CheckCircle2 size={14} className="text-emerald-500" />
+              <span>Fluent Match: Evaluator fluent in {targetUserLang}</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 px-4 py-1.5 text-xs font-semibold text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.05)] animate-pulse">
+              <AlertCircle size={14} className="text-amber-500" />
+              <span>Secondary Study: Resource is {targetBookLang} (Fluent: {targetUserLang})</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-10">

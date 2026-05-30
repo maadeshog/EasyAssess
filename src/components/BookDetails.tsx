@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Book as BookIcon, User, Calendar, Tag, Star, ArrowLeft, MessageSquare, CheckCircle2, AlertCircle, Award, ShieldCheck, Trash2 } from 'lucide-react';
+import { Book as BookIcon, User, Calendar, Tag, Star, ArrowLeft, MessageSquare, CheckCircle2, AlertCircle, Award, ShieldCheck, Trash2, Globe } from 'lucide-react';
 import { Book, Assessment, UserProfile } from '../types';
 import { Badge, Button, Card } from './ui';
 import { cn } from '@/src/lib/utils';
@@ -19,6 +19,10 @@ interface BookDetailsProps {
 export const BookDetails: React.FC<BookDetailsProps> = ({ book, assessments, onBack, onAssess, onDeleteBook, onDeleteAssessment, currentUser }) => {
   const isAdmin = currentUser?.role === 'admin';
   const canDelete = onDeleteBook && isAdmin;
+
+  const userLang = currentUser?.language || 'English';
+  const bookLang = book.language || 'English';
+  const isMatch = userLang.toLowerCase().trim() === bookLang.toLowerCase().trim();
 
   const handleDelete = () => {
     if (window.confirm('Move this resource to the trash? You can restore it later from the Resource Recovery Vault.')) {
@@ -69,7 +73,7 @@ export const BookDetails: React.FC<BookDetailsProps> = ({ book, assessments, onB
       <div className="grid gap-12 lg:gap-20 lg:grid-cols-12">
         {/* Left Column: Book Info */}
         <div className="space-y-8 sm:space-y-10 lg:col-span-5 order-2 lg:order-1">
-          <div className="relative overflow-hidden rounded-[40px] border border-noir-border/40 bg-black/40 p-4 shadow-2xl shadow-cyan-500/20">
+          <div className="relative overflow-hidden rounded-[40px] border border-noir-border/40 bg-black/40 p-4 shadow-2xl shadow-cyan-500/20 transition-all duration-300 hover:border-cyan-500/40 hover:shadow-[0_0_35px_rgba(6,182,212,0.3)]">
             {book.coverUrl ? (
               <img
                 src={book.coverUrl}
@@ -99,9 +103,25 @@ export const BookDetails: React.FC<BookDetailsProps> = ({ book, assessments, onB
                 </div>
               </div>
               <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">{book.title}</h1>
-              <div className="flex items-center gap-3 text-base sm:text-xl font-medium text-zinc-500">
-                <User size={18} className="text-cyan" />
-                <span>{book.author}</span>
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3 text-base sm:text-xl font-medium text-zinc-500">
+                  <User size={18} className="text-cyan" />
+                  <span>{book.author}</span>
+                </div>
+                {/* Smart Language-Match Indicator */}
+                <div>
+                  {isMatch ? (
+                    <div className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 text-xs font-semibold text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.05)]">
+                      <CheckCircle2 size={14} className="text-emerald-500" />
+                      <span>Fluent Match ({userLang})</span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 px-4 py-1.5 text-xs font-semibold text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.05)] animate-pulse">
+                      <AlertCircle size={14} className="text-amber-500" />
+                      <span>Secondary Language: {bookLang} (Preferred: {userLang})</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

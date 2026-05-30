@@ -49,6 +49,7 @@ const bookSchema = z.object({
   publisher: z.string().min(2, "Publisher name is too short").max(100),
   type: z.enum(['textbook', 'reference', 'ebook']),
   source: z.string().min(2, "Source is required").max(200),
+  language: z.string().min(2, "Language is too short").max(50),
   description: z.string().max(1000).optional(),
   coverUrl: z.string().url("Must be a valid URL").or(z.literal("")),
 });
@@ -74,6 +75,7 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
       type: 'textbook',
       year: new Date().getFullYear(),
       isbn: '',
+      language: 'English',
     }
   });
 
@@ -177,6 +179,11 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
                       <Input {...register('source')} placeholder="e.g. University Library, Open Access, etc." className="h-10 sm:h-12 text-sm" />
                       {errors.source && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.source.message}</p>}
                     </div>
+                    <div className="space-y-1 sm:space-y-2">
+                       <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Resource Language</label>
+                       <Input {...register('language')} placeholder="e.g. English, Spanish, Hindi, French" className="h-10 sm:h-12 text-sm" />
+                       {errors.language && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.language.message}</p>}
+                     </div>
                   </div>
 
                   <div className="space-y-1 sm:space-y-2">

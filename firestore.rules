@@ -97,6 +97,7 @@ service cloud.firestore {
              request.resource.data.isbn is string &&
              (request.resource.data.isbn.matches("^[0-9-]{10,20}[0-9X]?$")) &&
              isValidOptionalString('description', 0, 2000) &&
+             isValidOptionalString('language', 2, 50) &&
              data.year is number && data.year > 1900 &&
              data.type in ['textbook', 'reference', 'ebook'] &&
              (!('coverUrl' in data) || isValidUrl(data.coverUrl)) &&
@@ -127,15 +128,16 @@ service cloud.firestore {
     }
 
     function isValidUser(data) {
-      return hasRequiredFields(['uid', 'displayName', 'role', 'createdAt']) &&
-             hasOnlyAllowedFields(['uid', 'email', 'phoneNumber', 'displayName', 'role', 'createdAt', 'photoURL']) &&
+      return hasRequiredFields(['uid', 'displayName', 'role']) &&
+             hasOnlyAllowedFields(['uid', 'email', 'phoneNumber', 'displayName', 'role', 'createdAt', 'photoURL', 'language']) &&
              data.uid is string && data.uid.size() > 0 &&
              (!('email' in data) || data.email is string) &&
              (!('phoneNumber' in data) || data.phoneNumber is string) &&
              data.displayName is string && data.displayName.size() > 0 &&
              (!('photoURL' in data) || (data.photoURL == null || data.photoURL is string)) &&
+             (!('language' in data) || (data.language == null || data.language == "" || (data.language is string && data.language.size() >= 2 && data.language.size() <= 50))) &&
              data.role in ['admin', 'evaluator'] &&
-             data.createdAt is number;
+             (!('createdAt' in data) || data.createdAt is number);
     }
 
     function isValidFeedback(data) {

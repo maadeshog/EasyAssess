@@ -36,43 +36,43 @@ export const LandingPage: React.FC<{
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center overflow-hidden pt-20">
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden pt-20">
         {/* Background Atmosphere */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-noir-border/10 blur-[120px]"></div>
-          <div className="absolute bottom-1/4 right-1/4 h-[600px] w-[600px] rounded-full bg-noir-border/10 blur-[150px]"></div>
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-noir-border/10 blur-[120px]"></div>
+          <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 h-[600px] w-[600px] rounded-full bg-noir-border/10 blur-[150px]"></div>
         </div>
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12 grid gap-16 lg:grid-cols-2 lg:items-center">
+        <div className="relative z-10 mx-auto max-w-5xl px-6 lg:px-12 flex flex-col items-center text-center space-y-16">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="space-y-10"
+            className="space-y-10 flex flex-col items-center"
           >
             <div className="inline-flex items-center gap-3 rounded-full bg-black/60 px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white">
               <ShieldCheck size={14} />
               Verified Academic Standards
             </div>
-            <h1 className="text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-serif font-bold tracking-tight text-white leading-[1] md:leading-[0.9]">
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-serif font-bold tracking-tight text-white leading-[1.1] max-w-4xl">
               <span 
-                className="inline-block text-transparent bg-clip-text bg-[linear-gradient(110deg,#0ea5e9,45%,#fff,55%,#0ea5e9)] bg-[length:200%_100%] animate-shimmer italic pb-2 md:pb-0"
+                className="inline-block text-transparent bg-clip-text bg-[linear-gradient(110deg,#0891b2,45%,#ffffff,55%,#0891b2)] bg-[length:200%_100%] animate-shimmer italic pb-2 md:pb-0"
               >
                 EasyAssess
               </span> supports fast review of the book <span className="text-white">Quality</span>
             </h1>
-            <p className="max-w-xl text-base sm:text-xl leading-relaxed text-zinc-500 font-light">
+            <p className="max-w-2xl text-base sm:text-xl leading-relaxed text-zinc-400 font-light mx-auto">
               EasyAssess provides a prestigious framework for the rigorous evaluation of textbooks and academic resources. 
               Powered by verified peer-review metrics and global pedagogical standards.
             </p>
-            <div className="flex flex-wrap gap-4 sm:gap-6 pt-2">
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 pt-2">
               <Button 
                 size="lg" 
                 onClick={onGetStarted} 
-                className="relative group h-14 sm:h-16 px-8 sm:px-12 rounded-full overflow-hidden transition-all duration-500 hover:scale-105 active:scale-95 bg-noir-border"
+                className="relative group h-14 sm:h-16 px-10 sm:px-14 rounded-full overflow-hidden transition-all duration-500 hover:scale-105 active:scale-95 bg-black border border-cyan/40 shadow-[0_0_25px_rgba(8,145,178,0.25)] hover:shadow-[0_0_45px_rgba(8,145,178,0.73)]"
               >
-                {/* Outer Glow */}
-                <div className="absolute -inset-1 cyan-gradient blur-2xl opacity-40 group-hover:opacity-70 transition-opacity duration-500"></div>
+                {/* Outer Glow Overlay */}
+                <div className="absolute -inset-2 bg-gradient-to-r from-cyan-400/20 to-cyan-600/20 blur-xl opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
                 
                 <span className="relative z-10 flex items-center gap-3 text-white font-bold text-sm sm:text-lg tracking-wide uppercase">
                   Get Started
@@ -94,40 +94,22 @@ export const LandingPage: React.FC<{
                 </Button>
               )}
             </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8 pt-6">
-              <div className="flex -space-x-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-12 w-12 rounded-full border-2 border-black bg-black/60 overflow-hidden">
-                    <img 
-                      src={`https://picsum.photos/seed/user${i}/100/100`} 
-                      alt="User" 
-                      loading="lazy"
-                      decoding="async"
-                      referrerPolicy="no-referrer" 
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="text-sm">
-                <div className="font-bold text-white">1,200+ Verified Evaluators</div>
-                <div className="text-zinc-400">Contributing to global standards</div>
-              </div>
-            </div>
+
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="relative"
+            className="relative w-full max-w-4xl mx-auto"
           >
-            <div className="relative z-10 overflow-hidden rounded-[32px] sm:rounded-[40px] bg-black/60 p-2 sm:p-3 shadow-2xl shadow-white/5">
+            <div className="relative z-10 overflow-hidden rounded-[32px] sm:rounded-[40px] bg-black/60 p-2 sm:p-3 shadow-2xl shadow-cyan-950/80">
               <img
-                src="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=2000&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=100&w=3840&auto=format&fit=crop"
                 alt="Stack of antique books"
-                loading="lazy"
+                loading="eager"
                 decoding="async"
-                className="rounded-[24px] sm:rounded-[32px] object-cover w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[750px] opacity-100"
+                className="rounded-[24px] sm:rounded-[32px] object-cover w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[750px] opacity-100 brightness-[0.92] contrast-[1.05]"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
@@ -163,16 +145,16 @@ export const LandingPage: React.FC<{
       </section>
 
       {/* Features Section */}
-      <section id="features" className="mx-auto max-w-7xl px-6 lg:px-12 grid lg:grid-cols-2 gap-20 items-center">
-        <div className="space-y-10">
-          <div className="space-y-4">
+      <section id="features" className="mx-auto max-w-7xl px-6 lg:px-12 py-12">
+        <div className="space-y-16 max-w-5xl mx-auto">
+          <div className="space-y-4 text-center max-w-3xl mx-auto">
             <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-cyan">Rigorous Methodology</h2>
             <p className="text-5xl font-serif font-bold tracking-tight text-white leading-tight">
               Advanced evaluation systems for the modern academic era
             </p>
           </div>
           
-          <div className="space-y-8">
+          <div className="grid gap-10 md:grid-cols-3">
             <FeaturePoint
               icon={<Zap size={24} />}
               title="Real-time Metrics"
@@ -189,25 +171,6 @@ export const LandingPage: React.FC<{
               description="Fully aligned with international educational frameworks and accessibility standards."
             />
           </div>
-        </div>
-
-        <div className="relative">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            className="aspect-square rounded-[40px] overflow-hidden shadow-2xl"
-          >
-            <img 
-              src="https://images.unsplash.com/photo-1544640808-32ca72ac7f37?q=80&w=1200&auto=format&fit=crop" 
-              alt="Academic Excellence" 
-              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-              referrerPolicy="no-referrer"
-            />
-            <div className="absolute inset-0 bg-gradient-to-tr from-cyan/20 to-transparent mix-blend-overlay" />
-          </motion.div>
-          {/* Decorative floating elements */}
-          <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full cyan-gradient blur-3xl opacity-20" />
-          <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full cyan-gradient blur-3xl opacity-20" />
         </div>
       </section>
 

@@ -16,6 +16,7 @@ export interface Book {
   createdBy: string;
   status: 'active' | 'trashed';
   deletedAt?: number;
+  language?: string;
 }
 
 export interface Assessment {
@@ -45,4 +46,5 @@ export interface UserProfile {
   photoURL?: string;
   role: 'admin' | 'evaluator';
   createdAt: number;
+  language?: string;
 }
