@@ -17,6 +17,13 @@ export interface Book {
   status: 'active' | 'trashed';
   deletedAt?: number;
   language?: string;
+  system?: 'Ayurveda' | 'Unani' | 'Siddha' | 'General';
+  syllabusCompliance?: boolean;
+  subject?: string;
+  committeeDecision?: 'pending' | 'recommended' | 'revision-requested' | 'flagged-substandard';
+  committeeSummary?: string;
+  committeeDecisionAt?: number;
+  committeeDecisionBy?: string;
 }
 
 export interface Assessment {
@@ -47,4 +54,5 @@ export interface UserProfile {
   role: 'admin' | 'evaluator';
   createdAt: number;
   language?: string;
+  theme?: 'light' | 'dark';
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookOpen, User, LogOut, Menu, X, ShieldCheck, Trash2, Settings, Home, LayoutDashboard, Zap, Bot, ChevronDown, Download, Info, Sparkles, CheckCircle, Wifi } from 'lucide-react';
+import { BookOpen, User, LogOut, Menu, X, ShieldCheck, Trash2, Settings, Home, LayoutDashboard, Zap, Bot, ChevronDown, Download, Info, Sparkles, CheckCircle, Wifi, Sun, Moon } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { UserProfile } from '../types';
 
@@ -13,6 +13,8 @@ interface LayoutProps {
   isInstallable: boolean;
   onInstall: () => void;
   onNavigate?: (view: string) => void;
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
 }
 
 // Sleek Dynamic Bottom Island Button Component
@@ -62,23 +64,10 @@ const TabButton = React.memo(({ active, icon: Icon, label, onClick, delay = 0 }:
   );
 });
 
-export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLogout, onHome, currentView, isInstallable, onInstall, onNavigate }) => {
+export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLogout, onHome, currentView, isInstallable, onInstall, onNavigate, theme, onToggleTheme }) => {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isIslandExpanded, setIsIslandExpanded] = React.useState(false);
   const [latency, setLatency] = React.useState<number | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
-
-  // Block/unblock main thread window scrolling when mobile drawer is open
-  React.useEffect(() => {
-    if (isDrawerOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isDrawerOpen]);
 
   // Measure latency to show in the Dynamic Island status notification
   React.useEffect(() => {
@@ -126,10 +115,10 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLog
           }}
           transition={{ type: "spring", stiffness: 220, damping: 24 }}
           className={cn(
-            "pointer-events-auto flex items-center justify-between gap-4 px-4 sm:px-6 py-2 rounded-full bg-black/90 backdrop-blur-2xl border transition-all shadow-2xl duration-300",
+            "pointer-events-auto flex items-center justify-between gap-4 px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-zinc-950/95 via-black/98 to-zinc-950/95 backdrop-blur-3xl border transition-all duration-300 shadow-2xl",
             isScrolled 
-              ? "border-cyan/40 shadow-[0_15px_40px_rgba(0,0,0,0.85),0_0_25px_rgba(8,145,178,0.2)] py-1.5 mt-1" 
-              : "border-white/5 shadow-[0_10px_35px_rgba(0,0,0,0.5)] mt-0"
+              ? "border-cyan/40 hover:border-cyan/60 shadow-[0_15px_40px_rgba(0,0,0,0.9),0_0_25px_rgba(8,145,178,0.3)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.9),0_0_35px_rgba(8,145,178,0.45)] py-1.5 mt-1" 
+              : "border-white/10 hover:border-cyan/35 shadow-[0_12px_36px_rgba(0,0,0,0.6)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.6),0_0_20px_rgba(8,145,178,0.15)] mt-0"
           )}
         >
           {/* Brand/Logo Section */}
@@ -195,6 +184,22 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLog
               <span className="sm:hidden inline">Live</span>
             </motion.button>
 
+            {onToggleTheme && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onToggleTheme}
+                className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-white/10 dark:border-white/10 bg-zinc-900/60 dark:bg-zinc-900/60 text-zinc-400 dark:text-zinc-400 hover:text-cyan dark:hover:text-cyan hover:border-cyan/40 dark:hover:border-cyan/40 hover:shadow-[0_0_15px_rgba(8,145,178,0.25)] transition-all cursor-pointer select-none"
+                aria-label="Toggle Theme"
+              >
+                {theme === 'dark' ? (
+                  <Sun size={14} className="text-amber-400" />
+                ) : (
+                  <Moon size={14} className="text-cyan" />
+                )}
+              </motion.button>
+            )}
+
             {isInstallable && !isScrolled && (
               <button
                 onClick={onInstall}
@@ -206,26 +211,14 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLog
             )}
 
             {user && (
-              <button
-                onClick={() => setIsDrawerOpen(true)}
-                className="lg:hidden flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-zinc-900/60 text-zinc-400 hover:text-white hover:border-cyan/40 transition-all cursor-pointer"
-                aria-label="Open navigation menu"
-              >
-                <Menu size={16} />
-              </button>
-            )}
-
-            {user && (
-              <div className="hidden lg:block">
-                <UserDropdown 
-                  user={user} 
-                  onLogout={onLogout} 
-                  currentView={currentView}
-                  isInstallable={isInstallable}
-                  onInstall={onInstall}
-                  onNavigate={onNavigate}
-                />
-              </div>
+              <UserDropdown 
+                user={user} 
+                onLogout={onLogout} 
+                currentView={currentView}
+                isInstallable={isInstallable}
+                onInstall={onInstall}
+                onNavigate={onNavigate}
+              />
             )}
           </div>
         </motion.header>
@@ -361,171 +354,6 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLog
           </div>
         </div>
       </footer>
-
-      {/* Mobile & Tablet Slide-In Drawer Navigation */}
-      <AnimatePresence>
-        {isDrawerOpen && (
-          <>
-            {/* Backdrop Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsDrawerOpen(false)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 pointer-events-auto"
-            />
-
-            {/* Slider Panel */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 26, stiffness: 220 }}
-              className="fixed top-0 right-0 h-full w-[310px] sm:w-[350px] bg-[#050505]/98 border-l border-white/10 z-[60] flex flex-col pointer-events-auto shadow-[0_0_50px_rgba(0,0,0,0.95)]"
-            >
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-[24%] bg-black border border-white/10 overflow-hidden shadow-[0_2px_8px_rgba(8,145,178,0.25)]">
-                    <img src="/logo.svg" alt="EasyAssess Logo" className="h-5 w-5 object-contain" />
-                  </div>
-                  <span className="text-md font-serif font-black tracking-tight text-transparent bg-clip-text bg-[linear-gradient(110deg,#0ea5e9,45%,#fff,55%,#0ea5e9)] bg-[length:200%_100%] animate-shimmer">
-                    EasyAssess
-                  </span>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setIsDrawerOpen(false)}
-                  className="p-1.5 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-all cursor-pointer animate-shimmer"
-                >
-                  <X size={18} />
-                </motion.button>
-              </div>
-
-              {/* Drawer Scrollable Content */}
-              <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
-                {/* User Identity / Profile Card */}
-                {user && (
-                  <div className="p-4 rounded-2xl bg-zinc-950/60 border border-white/5 text-center flex flex-col items-center">
-                    <div className="h-16 w-16 rounded-full border border-cyan/40 bg-white/5 overflow-hidden p-0.5 shadow-[0_0_15px_rgba(8,145,178,0.25)] mb-3 relative group">
-                      {user.photoURL ? (
-                        <img src={user.photoURL} alt={user.displayName} className="h-full w-full rounded-full object-cover" referrerPolicy="no-referrer" />
-                      ) : (
-                        <div className="h-full w-full rounded-full bg-cyan/10 flex items-center justify-center">
-                          <User size={24} className="text-cyan" />
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="text-white font-serif font-black text-sm truncate max-w-full">{user.displayName || user.email || 'Evaluator'}</h3>
-                    <p className="text-zinc-500 font-mono text-[10px] mt-0.5 truncate max-w-full">{user.email || 'N/A'}</p>
-                    {user.role && (
-                      <span className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-cyan/20 bg-cyan/5 text-[9px] font-mono uppercase tracking-widest text-cyan font-black">
-                        {user.role}
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {/* Primary Navigation Links */}
-                <div className="space-y-1">
-                  <p className="px-3 text-[10px] font-mono tracking-widest text-zinc-500 uppercase mb-2">Navigation</p>
-                  
-                  <DrawerNavItem
-                    icon={<Home size={16} />}
-                    label="Home"
-                    onClick={() => { onNavigate?.('landing'); setIsDrawerOpen(false); }}
-                    active={currentView === 'landing' || currentView === undefined}
-                  />
-
-                  <DrawerNavItem
-                    icon={<LayoutDashboard size={16} />}
-                    label="Dashboard"
-                    onClick={() => { onNavigate?.('dashboard'); setIsDrawerOpen(false); }}
-                    active={currentView === 'dashboard'}
-                  />
-
-                  <DrawerNavItem
-                    icon={<Bot size={16} />}
-                    label="AI Chatbot"
-                    onClick={() => { onNavigate?.('chat'); setIsDrawerOpen(false); }}
-                    active={currentView === 'chat'}
-                  />
-
-                  <DrawerNavItem
-                    icon={<Settings size={16} />}
-                    label="Settings"
-                    onClick={() => { onNavigate?.('settings'); setIsDrawerOpen(false); }}
-                    active={currentView === 'settings'}
-                  />
-
-                  <DrawerNavItem
-                    icon={<User size={16} />}
-                    label="Profile"
-                    onClick={() => { onNavigate?.('profile'); setIsDrawerOpen(false); }}
-                    active={currentView === 'profile'}
-                  />
-                </div>
-
-                {/* Administration / System Links */}
-                <div className="space-y-1">
-                  <p className="px-3 text-[10px] font-mono tracking-widest text-zinc-500 uppercase mb-2">Tools & Management</p>
-
-                  {user && (user as any).role === 'admin' && (
-                    <DrawerNavItem
-                      icon={<ShieldCheck size={16} />}
-                      label="Admin Panel"
-                      onClick={() => { onNavigate?.('admin'); setIsDrawerOpen(false); }}
-                      active={currentView === 'admin'}
-                    />
-                  )}
-
-                  {user && (
-                    <DrawerNavItem
-                      icon={<Trash2 size={16} />}
-                      label="Trash Bin"
-                      onClick={() => { onNavigate?.('trash'); setIsDrawerOpen(false); }}
-                      active={currentView === 'trash'}
-                    />
-                  )}
-
-                  {isInstallable && (
-                    <DrawerNavItem
-                      icon={<Download size={16} className="text-cyan animate-bounce" />}
-                      label="Install App"
-                      onClick={() => { onInstall(); setIsDrawerOpen(false); }}
-                    />
-                  )}
-                </div>
-              </div>
-
-              {/* System State Info Bottom Capsule */}
-              <div className="p-4 mx-4 bg-zinc-950/40 rounded-xl border border-white/5 space-y-2">
-                <div className="flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-zinc-500">Latency Profile</span>
-                  <span className="text-cyan font-bold">{latency !== null ? `${latency} ms` : 'Evaluating...'}</span>
-                </div>
-                <div className="flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-zinc-500">Engine Node Status</span>
-                  <span className="text-cyan flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span> Localized
-                  </span>
-                </div>
-              </div>
-
-              {/* Drawer Footer Logout */}
-              <div className="p-6 border-t border-white/5">
-                <DrawerNavItem
-                  icon={<LogOut size={16} />}
-                  label="Log out"
-                  onClick={() => { onLogout?.(); setIsDrawerOpen(false); }}
-                  variant="danger"
-                />
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </div>
   );
 });
@@ -658,22 +486,3 @@ const DropdownItem = ({ icon, label, onClick, active, variant = 'default' }: { i
     {label}
   </button>
 );
-
-const DrawerNavItem = React.memo(({ icon, label, onClick, active, variant = 'default' }: { icon: React.ReactNode; label: string; onClick: () => void; active?: boolean; variant?: 'default' | 'danger' }) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "w-full flex items-center gap-3 py-2.5 rounded-xl text-xs font-semibold transition-all font-sans select-none min-h-[44px] cursor-pointer",
-      variant === 'danger' 
-        ? "text-zinc-400 hover:text-red-400 hover:bg-red-500/10" 
-        : active 
-          ? "bg-cyan/10 text-cyan border border-cyan/30 shadow-[0_0_15px_rgba(8,145,178,0.1)] font-bold text-white bg-black/40" 
-          : "text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent"
-    )}
-  >
-    <span className={cn("transition-colors flex shrink-0 items-center justify-center", variant === 'danger' ? "" : active ? "text-cyan" : "text-zinc-500 group-hover:text-white")}>
-      {icon}
-    </span>
-    <span>{label}</span>
-  </button>
-));

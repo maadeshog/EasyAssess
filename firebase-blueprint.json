@@ -19,7 +19,13 @@
         "createdBy": { "type": "string", "description": "UID of the user who added the book" },
         "status": { "type": "string", "enum": ["active", "trashed"], "description": "Status of the resource" },
         "deletedAt": { "type": "number", "description": "Timestamp when the resource was moved to trash" },
-        "language": { "type": "string", "description": "Preferred or native language of the resource" }
+        "language": { "type": "string", "description": "Preferred or native language of the resource" },
+        "system": { "type": "string", "enum": ["Ayurveda", "Unani", "Siddha", "General"], "description": "ASU Medical System classification" },
+        "syllabusCompliance": { "type": "boolean", "description": "Whether the textbook claims CCIM/NCISM syllabus compliance" },
+        "subject": { "type": "string", "description": "Academic subject or specialty under NCISM" },
+        "committeeDecision": { "type": "string", "enum": ["pending", "recommended", "revision-requested", "flagged-substandard"], "description": "Final NCISM expert committee review status" },
+        "committeeSummary": { "type": "string", "description": "Official synthesis and consensus summary by the expert committee" },
+        "committeeDecisionAt": { "type": "number", "description": "Timestamp of the committee's decision" }
       },
       "required": ["title", "author", "isbn", "publisher", "year", "type", "createdAt", "updatedAt", "createdBy", "status"]
     },
@@ -58,9 +64,11 @@
         "uid": { "type": "string", "description": "Firebase Auth UID" },
         "email": { "type": "string", "description": "User email address" },
         "displayName": { "type": "string", "description": "User display name" },
+        "photoURL": { "type": "string", "description": "User profile picture URL" },
         "role": { "type": "string", "enum": ["admin", "evaluator"], "description": "User role" },
         "createdAt": { "type": "number", "description": "Creation timestamp" },
-        "language": { "type": "string", "description": "Preferred language of the user for AI localized interactions" }
+        "language": { "type": "string", "description": "Preferred language of the user for AI localized interactions" },
+        "theme": { "type": "string", "enum": ["light", "dark"], "description": "Preferred visual theme" }
       },
       "required": ["uid", "displayName", "role", "createdAt"]
     },

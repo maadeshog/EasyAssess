@@ -52,6 +52,9 @@ const bookSchema = z.object({
   language: z.string().min(2, "Language is too short").max(50),
   description: z.string().max(1000).optional(),
   coverUrl: z.string().url("Must be a valid URL").or(z.literal("")),
+  system: z.enum(['Ayurveda', 'Unani', 'Siddha', 'General']),
+  subject: z.string().min(2, "Subject/Discipline is too short").max(100),
+  syllabusCompliance: z.boolean(),
 });
 
 type BookFormValues = z.infer<typeof bookSchema>;
@@ -76,6 +79,9 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
       year: new Date().getFullYear(),
       isbn: '',
       language: 'English',
+      system: 'Ayurveda',
+      subject: '',
+      syllabusCompliance: true,
     }
   });
 
@@ -84,11 +90,11 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
     
     // Simulate Automated Screening as per the workflow image
     const statuses = [
-      'Performing Plagiarism Check...',
-      'Verifying Formatting Standards...',
-      'Validating ISBN Checksum...',
-      'Cross-referencing Academic Databases...',
-      'Finalizing Automated Report...'
+      'Verifying ISBN Checksum & Publisher Authenticity...',
+      'Validating declared CCIM / NCISM syllabus coverage...',
+      'Cross-referencing conflict-of-interest databases...',
+      'Analyzing content alignment & ASU terminology...',
+      'Assembling compliance dossier & routing to reviewers...'
     ];
 
     for (let i = 0; i < statuses.length; i++) {
@@ -181,9 +187,40 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
                     </div>
                     <div className="space-y-1 sm:space-y-2">
                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Resource Language</label>
-                       <Input {...register('language')} placeholder="e.g. English, Spanish, Hindi, French" className="h-10 sm:h-12 text-sm" />
+                       <Input {...register('language')} placeholder="e.g. English, Sanskrit, Hindi, French" className="h-10 sm:h-12 text-sm" />
                        {errors.language && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.language.message}</p>}
                      </div>
+                     <div className="space-y-1 sm:space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">ASU Medical System</label>
+                        <select
+                          {...register('system')}
+                          className="w-full h-10 sm:h-12 rounded-2xl border border-noir-border/30 bg-black/60 px-4 text-xs font-bold uppercase tracking-widest text-zinc-400 focus:ring-1 focus:ring-noir-border/50 outline-none hover:border-cyan/40 transition-colors"
+                        >
+                          <option value="Ayurveda" className="bg-zinc-900 text-white">Ayurveda System</option>
+                          <option value="Unani" className="bg-zinc-900 text-white">Unani System</option>
+                          <option value="Siddha" className="bg-zinc-900 text-white">Siddha System</option>
+                          <option value="General" className="bg-zinc-900 text-white">General / Other</option>
+                        </select>
+                     </div>
+                     <div className="space-y-1 sm:space-y-2 md:col-span-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Subject / Discipline Specialty (e.g., Kriya Sharir)</label>
+                        <Input {...register('subject')} placeholder="e.g. Kriya Sharir, Samhita, Kulliyat, Tashreeh, Gunapadam" className="h-10 sm:h-12 text-sm" />
+                        {errors.subject && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.subject.message}</p>}
+                     </div>
+                  </div>
+
+                  <div className="space-y-1 sm:space-y-2 select-none">
+                    <label className="relative flex items-center gap-4 rounded-2xl border border-noir-border/40 bg-black/60 p-4 cursor-pointer hover:border-cyan/40 transition-colors">
+                      <input 
+                        type="checkbox" 
+                        {...register('syllabusCompliance')} 
+                        className="h-5 w-5 rounded border-noir-border/30 bg-black/80 text-cyan focus:ring-cyan focus:ring-offset-black accent-cyan"
+                      />
+                      <div className="space-y-0.5">
+                        <span className="text-xs font-bold uppercase tracking-wider text-white">Syllabus Compliance Declared (NCISM / CCIM)</span>
+                        <p className="text-[10px] text-zinc-500">The textbook formally states that it has been written strictly as per CCIM or NCISM syllabus guidelines.</p>
+                      </div>
+                    </label>
                   </div>
 
                   <div className="space-y-1 sm:space-y-2">

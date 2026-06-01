@@ -43,7 +43,7 @@ export default function App() {
   const [isInstallable, setIsInstallable] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showBypass, setShowBypass] = useState(false);
-  const [theme] = useState<'light' | 'dark'>(() => {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
   });
 
@@ -79,6 +79,30 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  const toggleTheme = useCallback(async () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    if (user && user.uid && user.uid !== "offline-guest-uid") {
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, { theme: newTheme });
+        setUser(prev => prev ? { ...prev, theme: newTheme } : null);
+      } catch (e) {
+        console.error("Failed to sync theme across sessions", e);
+      }
+    }
+  }, [theme, user]);
+
+  // Sync theme with user object updates (e.g., from Settings page or Login)
+  useEffect(() => {
+    if (user?.theme) {
+      setTheme(user.theme);
+      localStorage.setItem('theme', user.theme);
+    }
+  }, [user?.theme]);
 
   // PWA Install Logic
   useEffect(() => {
@@ -148,6 +172,10 @@ export default function App() {
           
           if (userSnap.exists()) {
             const userData = userSnap.data() as UserProfile;
+            if (userData.theme) {
+              setTheme(userData.theme);
+              localStorage.setItem('theme', userData.theme);
+            }
             if (firebaseUser.photoURL && userData.photoURL !== firebaseUser.photoURL) {
               userData.photoURL = firebaseUser.photoURL;
               try {
@@ -206,6 +234,12 @@ export default function App() {
         loadedBooks.push({ id: doc.id, ...doc.data() } as Book);
       });
       setBooks(loadedBooks.sort((a, b) => b.createdAt - a.createdAt));
+      // Keep selectedBook state in sync with real-time updates
+      setSelectedBook(prev => {
+        if (!prev) return null;
+        const fresh = loadedBooks.find(b => b.id === prev.id);
+        return fresh || prev;
+      });
       setIsDataLoading(false);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'books');
@@ -254,6 +288,18 @@ export default function App() {
       setIsAddModalOpen(false);
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, `books/${newId}`);
+    }
+  }, [user]);
+
+  const handleUpdateBook = useCallback(async (bookId: string, updatedFields: Partial<Book>) => {
+    if (!user) return;
+    try {
+      await updateDoc(doc(db, 'books', bookId), {
+        ...updatedFields,
+        updatedAt: Date.now()
+      });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `books/${bookId}`);
     }
   }, [user]);
 
@@ -554,6 +600,8 @@ export default function App() {
               isInstallable={isInstallable}
               onInstall={onInstall}
               onNavigate={(v) => setView(v as View)}
+              theme={theme}
+              onToggleTheme={toggleTheme}
             >
               <div className="flex min-h-[70vh] items-center justify-center px-6">
                 <div className="max-w-md w-full glass-panel rounded-[40px] p-12 text-center space-y-8">
@@ -595,6 +643,8 @@ export default function App() {
               isInstallable={isInstallable}
               onInstall={onInstall}
               onNavigate={(v) => setView(v as View)}
+              theme={theme}
+              onToggleTheme={toggleTheme}
             >
               <AnimatePresence mode="wait">
                 {view === 'landing' && (
@@ -663,6 +713,7 @@ export default function App() {
                       onDeleteBook={handleDeleteBook}
                       onDeleteAssessment={handleDeleteAssessment}
                       currentUser={user}
+                      onUpdateBook={handleUpdateBook}
                     />
                   </motion.div>
                 )}

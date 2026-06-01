@@ -129,13 +129,14 @@ service cloud.firestore {
 
     function isValidUser(data) {
       return hasRequiredFields(['uid', 'displayName', 'role']) &&
-             hasOnlyAllowedFields(['uid', 'email', 'phoneNumber', 'displayName', 'role', 'createdAt', 'photoURL', 'language']) &&
+             hasOnlyAllowedFields(['uid', 'email', 'phoneNumber', 'displayName', 'role', 'createdAt', 'photoURL', 'language', 'theme']) &&
              data.uid is string && data.uid.size() > 0 &&
              (!('email' in data) || data.email is string) &&
              (!('phoneNumber' in data) || data.phoneNumber is string) &&
              data.displayName is string && data.displayName.size() > 0 &&
              (!('photoURL' in data) || (data.photoURL == null || data.photoURL is string)) &&
              (!('language' in data) || (data.language == null || data.language == "" || (data.language is string && data.language.size() >= 2 && data.language.size() <= 50))) &&
+             (!('theme' in data) || (data.theme in ['light', 'dark'])) &&
              data.role in ['admin', 'evaluator'] &&
              (!('createdAt' in data) || data.createdAt is number);
     }

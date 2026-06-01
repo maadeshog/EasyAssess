@@ -75,8 +75,15 @@ export const BookCard: React.FC<BookCardProps> = React.memo(({
           
           <div className="absolute left-6 top-6 flex flex-col gap-2">
             {!isSelectionMode && (
-              <div className="rounded-full bg-black/40 border border-noir-border/40 px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
-                {book.type}
+              <div className="flex flex-col gap-1.5 items-start">
+                <div className="rounded-full bg-black/40 border border-noir-border/40 px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
+                  {book.type}
+                </div>
+                {book.system && (
+                  <div className="rounded-full bg-purple-500/25 border border-purple-500/40 px-3 py-0.5 text-[8px] font-bold uppercase tracking-widest text-purple-300">
+                    {book.system}
+                  </div>
+                )}
               </div>
             )}
             {canDelete && onDelete && !isSelectionMode && (
@@ -103,9 +110,18 @@ export const BookCard: React.FC<BookCardProps> = React.memo(({
 
           {/* Smart Assessment Badge */}
           <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between pointer-events-none">
-            <div className="rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 px-3 py-1 text-[8px] font-bold uppercase tracking-widest text-emerald-400 flex items-center gap-1.5">
+            <div className={cn(
+              "rounded-full backdrop-blur-md px-3 py-1 text-[8px] font-bold uppercase tracking-widest flex items-center gap-1.5 border",
+              book.committeeDecision === 'recommended' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+              book.committeeDecision === 'revision-requested' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+              book.committeeDecision === 'flagged-substandard' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+              'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+            )}>
               <ShieldCheck size={10} />
-              Screened
+              {book.committeeDecision === 'recommended' ? 'NCISM Sanctioned' :
+               book.committeeDecision === 'revision-requested' ? 'Syllabus Deficit' :
+               book.committeeDecision === 'flagged-substandard' ? 'Censured Text' :
+               'Screened'}
             </div>
             {book.language && (
               <div className="rounded-full bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 px-3 py-1 text-[8px] font-bold uppercase tracking-widest text-cyan-400 flex items-center gap-1.5">

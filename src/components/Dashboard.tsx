@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { BarChart3, TrendingUp, Users, BookOpen, Search, Filter, Plus, ShieldCheck, ArrowUpDown, X, Zap, LayoutDashboard, Home, Star, ArrowLeft, Globe } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, BookOpen, Search, Filter, Plus, ShieldCheck, ArrowUpDown, X, Zap, LayoutDashboard, Home, Star, ArrowLeft, Globe, Layers } from 'lucide-react';
 import { Book, Assessment, UserProfile } from '@/src/types';
 import { BookCard } from './BookCard';
 import { Button, Input, Card, Skeleton } from './ui';
@@ -24,6 +24,7 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState<'all' | 'textbook' | 'reference' | 'ebook'>('all');
   const [langFilter, setLangFilter] = React.useState<string>('all');
+  const [systemFilter, setSystemFilter] = React.useState<string>('all');
   const [sortBy, setSortBy] = React.useState<'newest' | 'rating' | 'title' | 'year-asc' | 'year-desc'>('newest');
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = React.useState(false);
@@ -64,7 +65,8 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
                            book.isbn.toLowerCase().includes(search.toLowerCase());
       const matchesFilter = filter === 'all' || book.type === filter;
       const matchesLang = langFilter === 'all' || book.language === langFilter;
-      return matchesSearch && matchesFilter && matchesLang;
+      const matchesSystem = systemFilter === 'all' || book.system === systemFilter;
+      return matchesSearch && matchesFilter && matchesLang && matchesSystem;
     })
     .sort((a, b) => {
       if (sortBy === 'newest') return b.createdAt - a.createdAt;
@@ -75,9 +77,9 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
         return bookRatings[b.id] - bookRatings[a.id];
       }
       return 0;
-    }), [books, search, filter, langFilter, sortBy, bookRatings]);
+    }), [books, search, filter, langFilter, systemFilter, sortBy, bookRatings]);
 
-  const isFiltered = search !== '' || filter !== 'all' || langFilter !== 'all';
+  const isFiltered = search !== '' || filter !== 'all' || langFilter !== 'all' || systemFilter !== 'all';
 
   const toggleSelection = React.useCallback((id: string) => {
     setSelectedIds(prev => 
@@ -345,7 +347,7 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
             ))}
             {isFiltered && (
               <button 
-                onClick={() => { setSearch(''); setFilter('all'); setLangFilter('all'); }}
+                onClick={() => { setSearch(''); setFilter('all'); setLangFilter('all'); setSystemFilter('all'); }}
                 className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:bg-red-400/10 transition-colors"
               >
                 <X size={12} />
@@ -369,6 +371,24 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
                 {availableLanguages.map(lang => (
                   <option key={lang} value={lang} className="bg-dark-surface text-white">{lang}</option>
                 ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                <Layers size={12} className="text-purple-400" />
+                ASU System
+              </div>
+              <select
+                value={systemFilter}
+                onChange={(e) => setSystemFilter(e.target.value)}
+                className="h-11 rounded-xl border border-noir-border/20 bg-black/40 px-4 text-[10px] font-bold uppercase tracking-widest text-zinc-400 outline-none focus:ring-1 focus:ring-noir-border/50 hover:border-cyan/40 transition-all cursor-pointer"
+              >
+                <option value="all" className="bg-dark-surface text-white">All ASU Systems</option>
+                <option value="Ayurveda" className="bg-dark-surface text-white">Ayurveda System</option>
+                <option value="Unani" className="bg-dark-surface text-white">Unani System</option>
+                <option value="Siddha" className="bg-dark-surface text-white">Siddha System</option>
+                <option value="General" className="bg-dark-surface text-white">General / Other</option>
               </select>
             </div>
 

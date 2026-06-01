@@ -19,7 +19,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ user, onBack, onUpda
   const [photoURL, setPhotoURL] = useState(user.photoURL || '');
   const [language, setLanguage] = useState(user.language || 'English');
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    return (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
+    return user.theme || (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -35,6 +35,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ user, onBack, onUpda
         displayName,
         photoURL: photoURL || null,
         language,
+        theme,
       };
       
       localStorage.setItem('theme', theme);
