@@ -2,9 +2,11 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { X, Plus, Image as ImageIcon, ShieldCheck, AlertCircle } from 'lucide-react';
+import { X, Plus, Image as ImageIcon, ShieldCheck, AlertCircle, Scan, Sparkles, RefreshCw } from 'lucide-react';
 import { Button, Input } from './ui';
 import { motion, AnimatePresence } from 'motion/react';
+import { IsbnScanner } from './IsbnScanner';
+import { ScannerPrefillData, PRESET_BOOKS } from '@/src/lib/asuPresets';
 
 const isValidISBN = (isbn: string) => {
   const clean = isbn.replace(/[-\s]/g, '');
@@ -71,8 +73,13 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
   const [step, setStep] = React.useState<ModalStep>('entry');
   const [screeningProgress, setScreeningProgress] = React.useState(0);
   const [screeningStatus, setScreeningStatus] = React.useState('Initializing...');
+  const [isScannerOpen, setIsScannerOpen] = React.useState(false);
+  const [isIdentifying, setIsIdentifying] = React.useState(false);
+  const [identifyStatus, setIdentifyStatus] = React.useState<string | null>(null);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, trigger } = useForm<BookFormValues>({
+  const lastQueriedIsbnRef = React.useRef<string>('');
+
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, trigger, setValue, watch } = useForm<BookFormValues>({
     resolver: zodResolver(bookSchema),
     defaultValues: {
       type: 'textbook',
@@ -82,8 +89,187 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
       system: 'Ayurveda',
       subject: '',
       syllabusCompliance: true,
+      source: 'AYUSH Academic Portal',
+      description: '',
+      coverUrl: '',
     }
   });
+
+  const watchedIsbn = watch('isbn');
+
+  // Automatic identification and field filling when entered or scanned
+  React.useEffect(() => {
+    const identifyBook = async (rawIsbn: string) => {
+      const cleanIsbnValue = rawIsbn.replace(/[-\s]/g, '').trim();
+      if (!isValidISBN(cleanIsbnValue)) {
+        return;
+      }
+
+      if (cleanIsbnValue === lastQueriedIsbnRef.current) {
+        return;
+      }
+
+      lastQueriedIsbnRef.current = cleanIsbnValue;
+      setIsIdentifying(true);
+      setIdentifyStatus('Auto-identifying textbook...');
+
+      // 1. Check in PRESET_BOOKS for instantaneous local registry hits
+      const matchInPreset = PRESET_BOOKS.find(b => b.isbn.replace(/[-\s]/g, '') === cleanIsbnValue);
+      if (matchInPreset) {
+        // Wait 400ms for high-end aesthetic feedback feel
+        await new Promise(r => setTimeout(r, 450));
+        reset({
+          title: matchInPreset.title,
+          author: matchInPreset.author,
+          isbn: rawIsbn,
+          year: matchInPreset.year,
+          publisher: matchInPreset.publisher,
+          type: matchInPreset.type,
+          source: matchInPreset.source,
+          language: matchInPreset.language,
+          system: matchInPreset.system,
+          subject: matchInPreset.subject,
+          syllabusCompliance: matchInPreset.syllabusCompliance,
+          description: matchInPreset.description,
+          coverUrl: matchInPreset.coverUrl,
+        });
+        trigger();
+        setIsIdentifying(false);
+        setIdentifyStatus('Local ASU Registry Prefill Confirmed! ✓');
+        setTimeout(() => setIdentifyStatus(null), 4000);
+        return;
+      }
+
+      // 2. Query Google Books API
+      try {
+        setIdentifyStatus('Searching international ISBN registries...');
+        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${cleanIsbnValue}`);
+        if (!response.ok) {
+          throw new Error('Google Books server did not respond');
+        }
+        const data = await response.json();
+        if (data && data.items && data.items.length > 0) {
+          const info = data.items[0].volumeInfo;
+          
+          const authors = info.authors ? info.authors.join(', ') : 'Unknown Author';
+          const title = info.title || 'Unknown Title';
+          const publisher = info.publisher || 'Unknown Publisher';
+          const rawDate = info.publishedDate || '';
+          let parsedYear = new Date().getFullYear();
+          if (rawDate) {
+            const matchYear = rawDate.match(/\d{4}/);
+            if (matchYear) parsedYear = parseInt(matchYear[0]);
+          }
+          const description = info.description || '';
+          const coverUrl = info.imageLinks ? (info.imageLinks.thumbnail || info.imageLinks.smallThumbnail || '') : '';
+
+          // Intelligently classify System
+          let detectedSystem: 'Ayurveda' | 'Unani' | 'Siddha' | 'General' = 'General';
+          const searchSource = `${title} ${description}`.toLowerCase();
+          if (searchSource.includes('ayur') || searchSource.includes('charaka') || searchSource.includes('sushruta') || searchSource.includes('vagbhata') || searchSource.includes('samhita') || searchSource.includes('dravyaguna') || searchSource.includes('kriya') || searchSource.includes('snana') || searchSource.includes('rasa')) {
+            detectedSystem = 'Ayurveda';
+          } else if (searchSource.includes('unani') || searchSource.includes('hakim') || searchSource.includes('kulliyat') || searchSource.includes('qanoon') || searchSource.includes('tashreeh') || searchSource.includes('umoor')) {
+            detectedSystem = 'Unani';
+          } else if (searchSource.includes('siddha') || searchSource.includes('tirumandiram') || searchSource.includes('gunapadam') || searchSource.includes('mooligai') || searchSource.includes('vaithiya')) {
+            detectedSystem = 'Siddha';
+          }
+
+          // Dynamically fill only non-empty fields or reset them with fallback values
+          setValue('title', title);
+          setValue('author', authors);
+          setValue('publisher', publisher);
+          setValue('year', parsedYear);
+          setValue('description', description.substring(0, 800));
+          setValue('system', detectedSystem);
+          if (coverUrl) {
+            setValue('coverUrl', coverUrl.replace(/^http:/, 'https:'));
+          }
+
+          trigger();
+          setIdentifyStatus('Auto-identified & filled! ✓');
+          setTimeout(() => setIdentifyStatus(null), 4000);
+          setIsIdentifying(false);
+          return;
+        }
+      } catch (err) {
+        console.warn('Google Books fetch failed, attempting Open Library fallbacks...', err);
+      }
+
+      // 3. Fallback to Open Library
+      try {
+        setIdentifyStatus('Searching Open Library index...');
+        const response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${cleanIsbnValue}&format=json&jscmd=data`);
+        if (!response.ok) {
+          throw new Error('Open Library failed');
+        }
+        const data = await response.json();
+        const bookKey = `ISBN:${cleanIsbnValue}`;
+        if (data && data[bookKey]) {
+          const info = data[bookKey];
+          
+          const title = info.title || 'Unknown Title';
+          const authors = info.authors ? info.authors.map((a: any) => a.name).join(', ') : 'Unknown Author';
+          const publisher = info.publishers ? info.publishers.map((p: any) => p.name).join(', ') : 'Unknown Publisher';
+          const rawDate = info.publish_date || '';
+          let parsedYear = new Date().getFullYear();
+          if (rawDate) {
+            const matchYear = rawDate.match(/\d{4}/);
+            if (matchYear) parsedYear = parseInt(matchYear[0]);
+          }
+          const coverUrl = info.cover ? (info.cover.large || info.cover.medium || info.cover.small || '') : '';
+
+          setValue('title', title);
+          setValue('author', authors);
+          setValue('publisher', publisher);
+          setValue('year', parsedYear);
+          if (coverUrl) {
+            setValue('coverUrl', coverUrl.replace(/^http:/, 'https:'));
+          }
+
+          trigger();
+          setIdentifyStatus('Auto-identified from Open Library! ✓');
+          setTimeout(() => setIdentifyStatus(null), 4000);
+          setIsIdentifying(false);
+          return;
+        }
+      } catch (err) {
+        console.error('Open Library fallback failed', err);
+      }
+
+      // If nothing found
+      setIdentifyStatus('Identified failed: No registry matches found');
+      setTimeout(() => setIdentifyStatus(null), 4000);
+      setIsIdentifying(false);
+    };
+
+    identifyBook(watchedIsbn || '');
+  }, [watchedIsbn, reset, setValue, trigger]);
+
+  const handleScanSuccess = (scannedIsbn: string, prefillData?: ScannerPrefillData) => {
+    setIsScannerOpen(false);
+    if (prefillData) {
+      reset({
+        title: prefillData.title,
+        author: prefillData.author,
+        isbn: prefillData.isbn,
+        year: prefillData.year,
+        publisher: prefillData.publisher,
+        type: prefillData.type,
+        source: prefillData.source,
+        language: prefillData.language,
+        system: prefillData.system,
+        subject: prefillData.subject,
+        syllabusCompliance: prefillData.syllabusCompliance,
+        description: prefillData.description,
+        coverUrl: prefillData.coverUrl,
+      });
+      // Optionally trigger validation instantly for satisfaction
+      trigger();
+    } else {
+      setValue('isbn', scannedIsbn);
+      trigger('isbn');
+    }
+  };
 
   const onSubmit = async (data: BookFormValues) => {
     setStep('screening');
@@ -99,10 +285,10 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
 
     for (let i = 0; i < statuses.length; i++) {
       setScreeningStatus(statuses[i]);
-      // Progress increments
-      for (let p = 0; p < 20; p++) {
-        setScreeningProgress(prev => Math.min(prev + 1, (i + 1) * 20));
-        await new Promise(r => setTimeout(r, 30));
+      // Progress increments: 80 steps of 0.25% at 8.33ms (targets 120Hz refresh rates perfectly)
+      for (let p = 0; p < 80; p++) {
+        setScreeningProgress(prev => Math.min(prev + 0.25, (i + 1) * 20));
+        await new Promise(r => setTimeout(r, 8.33));
       }
     }
 
@@ -151,7 +337,15 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+              <AnimatePresence>
+                {isScannerOpen && (
+                  <IsbnScanner 
+                    onScanSuccess={handleScanSuccess} 
+                    onClose={() => setIsScannerOpen(false)} 
+                  />
+                )}
+              </AnimatePresence>
               {step === 'entry' && (
                 <form onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-8 space-y-4 sm:space-y-8">
                   <div className="grid gap-4 md:grid-cols-2">
@@ -166,9 +360,38 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
                       {errors.author && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.author.message}</p>}
                     </div>
                     <div className="space-y-1 sm:space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">ISBN Number</label>
-                      <Input {...register('isbn')} placeholder="e.g. 978-0-13-110362-7" className="h-10 sm:h-12 text-sm" />
-                      {errors.isbn && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.isbn.message}</p>}
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">ISBN Number</label>
+                        <button
+                          type="button"
+                          onClick={() => setIsScannerOpen(true)}
+                          className="flex items-center gap-1.5 text-[9px]/tight font-bold uppercase tracking-[0.15em] text-cyan hover:text-cyan-400 transition-colors bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-0.5 rounded-full cursor-pointer"
+                        >
+                          <Scan size={10} className="animate-pulse" />
+                          <span>Scan QR / Barcode</span>
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <Input 
+                          {...register('isbn')} 
+                          placeholder="e.g. 978-0-13-110362-7" 
+                          className={`h-10 sm:h-12 pr-10 text-sm transition-all duration-300 ${isIdentifying ? 'border-cyan/60 bg-cyan-950/10 shadow-[0_0_15px_rgba(6,182,212,0.15)] text-white' : ''}`} 
+                        />
+                        {isIdentifying && (
+                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
+                            <RefreshCw size={14} className="text-cyan animate-spin" />
+                          </div>
+                        )}
+                      </div>
+                      {identifyStatus && (
+                        <div className="flex items-center gap-1.5 px-1 py-0.5">
+                          <Sparkles size={11} className={`${isIdentifying ? 'text-cyan animate-pulse' : 'text-emerald-400 animate-bounce'}`} />
+                          <span className={`text-[10px] font-bold tracking-wider uppercase ${isIdentifying ? 'text-cyan/90' : identifyStatus.includes('failed') ? 'text-red-400' : 'text-emerald-400'}`}>
+                            {identifyStatus}
+                          </span>
+                        </div>
+                      )}
+                      {errors.isbn && !identifyStatus && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest px-1">{errors.isbn.message}</p>}
                     </div>
                     <div className="space-y-1 sm:space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Publication Year</label>
@@ -283,13 +506,14 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
                   <div className="space-y-4 w-full max-w-sm">
                     <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-cyan">
                       <span>{screeningStatus}</span>
-                      <span>{screeningProgress}%</span>
+                      <span>{Math.round(screeningProgress)}%</span>
                     </div>
                     <div className="h-2 w-full bg-black/60 rounded-full overflow-hidden border border-noir-border/20">
                       <motion.div 
-                        className="h-full cyan-gradient"
+                        className="h-full cyan-gradient shadow-[0_0_8px_rgba(34,211,238,0.5)]"
                         initial={{ width: 0 }}
                         animate={{ width: `${screeningProgress}%` }}
+                        transition={{ type: "tween", ease: "linear", duration: 0.00833 }}
                       />
                     </div>
                   </div>

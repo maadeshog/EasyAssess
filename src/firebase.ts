@@ -7,7 +7,7 @@ const app = initializeApp(firebaseConfig);
 
 // Use initializeFirestore with optimized settings for containerized environments
 export const db = initializeFirestore(app, {
-  experimentalAutoDetectLongPolling: true,
+  experimentalForceLongPolling: true,
 }, (firebaseConfig as any).firestoreDatabaseId || '(default)');
 
 export const auth = getAuth(app);
