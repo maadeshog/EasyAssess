@@ -32,6 +32,11 @@ export const SpaceBackground: React.FC = React.memo(() => {
           repeat: Infinity,
           ease: "easeInOut",
         }}
+        style={{
+          transform: 'translate3d(0, 0, 0)',
+          backfaceVisibility: 'hidden',
+          willChange: 'transform',
+        }}
         className="absolute top-[10%] left-[8%] w-[25rem] sm:w-[35rem] h-[25rem] sm:h-[35rem] rounded-full blur-[120px] mix-blend-screen pointer-events-none bg-cyan-950/20"
       />
       
@@ -46,6 +51,11 @@ export const SpaceBackground: React.FC = React.memo(() => {
           repeat: Infinity,
           ease: "easeInOut",
         }}
+        style={{
+          transform: 'translate3d(0, 0, 0)',
+          backfaceVisibility: 'hidden',
+          willChange: 'transform',
+        }}
         className="absolute bottom-[10%] right-[8%] w-[30rem] sm:w-[45rem] h-[30rem] sm:h-[45rem] rounded-full blur-[140px] mix-blend-screen pointer-events-none bg-purple-950/15"
       />
 
@@ -58,6 +68,11 @@ export const SpaceBackground: React.FC = React.memo(() => {
           duration: 25,
           repeat: Infinity,
           ease: "easeInOut",
+        }}
+        style={{
+          transform: 'translate3d(0, 0, 0)',
+          backfaceVisibility: 'hidden',
+          willChange: 'transform',
         }}
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[45rem] sm:w-[60rem] h-[45rem] sm:h-[60rem] rounded-full blur-[160px] mix-blend-screen pointer-events-none bg-emerald-950/10"
       />
@@ -83,10 +98,13 @@ export const SpaceBackground: React.FC = React.memo(() => {
               width: p.size,
               height: p.size,
               borderRadius: '50%',
-              backgroundColor: p.id % 2 === 0 ? 'rgba(6, 182, 212, 0.6)' : 'rgba(16, 185, 129, 0.4)', // Cyan vs Emerald accents
+              backgroundColor: p.id % 2 === 0 ? 'rgba(6, 182, 212, 0.7)' : 'rgba(16, 185, 129, 0.6)', // Cyan vs Emerald accents
               boxShadow: p.id % 2 === 0 
-                ? '0 0 10px rgba(6, 182, 212, 0.8), 0 0 20px rgba(6, 182, 212, 0.4)' 
-                : '0 0 10px rgba(16, 185, 129, 0.6), 0 0 20px rgba(16, 185, 129, 0.3)',
+                ? '0 0 6px rgba(6, 182, 212, 0.8)' 
+                : '0 0 6px rgba(16, 185, 129, 0.8)',
+              transform: 'translate3d(0,0,0)',
+              backfaceVisibility: 'hidden',
+              willChange: 'transform, opacity',
             }}
           />
         ))}

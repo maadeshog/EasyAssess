@@ -10,61 +10,68 @@ interface GPaySuccessScreenProps {
 }
 
 export const playGPayChime = () => {
-  try {
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
-    
-    // Low pass filter to make it sound premium and soft, not harsh
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(3200, ctx.currentTime);
-    filter.Q.setValueAtTime(1, ctx.currentTime);
-    filter.connect(ctx.destination);
+  // Run asynchronously after the page paints to avoid blocking the critical entry keyframes
+  setTimeout(async () => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      
+      if (ctx.state === 'suspended') {
+        await ctx.resume().catch(() => {});
+      }
+      
+      // Low pass filter to make it sound premium and soft, not harsh
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(3200, ctx.currentTime);
+      filter.Q.setValueAtTime(1, ctx.currentTime);
+      filter.connect(ctx.destination);
 
-    const playTone = (freq: number, startTime: number, duration: number, gainVal: number) => {
-      const osc = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-      
-      osc.type = 'sine'; // Pure sweet bell-like tone
-      osc.frequency.setValueAtTime(freq, startTime);
-      
-      // Google Pay dual bell chime has a slight frequency glide for natural warmth
-      osc.frequency.exponentialRampToValueAtTime(freq * 1.002, startTime + duration);
-      
-      gainNode.gain.setValueAtTime(0.01, startTime);
-      gainNode.gain.linearRampToValueAtTime(gainVal, startTime + 0.05);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-      
-      osc.connect(gainNode);
-      gainNode.connect(filter);
-      
-      osc.start(startTime);
-      osc.stop(startTime + duration);
-    };
+      const playTone = (freq: number, startTime: number, duration: number, gainVal: number) => {
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        
+        osc.type = 'sine'; // Pure sweet bell-like tone
+        osc.frequency.setValueAtTime(freq, startTime);
+        
+        // Google Pay dual bell chime has a slight frequency glide for natural warmth
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.002, startTime + duration);
+        
+        gainNode.gain.setValueAtTime(0.01, startTime);
+        gainNode.gain.linearRampToValueAtTime(gainVal, startTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        
+        osc.connect(gainNode);
+        gainNode.connect(filter);
+        
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
 
-    // GPay chime arpeggio (E-flat major arpeggio - beautiful and bright):
-    const now = ctx.currentTime;
-    playTone(587.33, now, 0.45, 0.12);                  // D5
-    playTone(784.00, now + 0.08, 0.55, 0.18);            // G5
-    playTone(1046.50, now + 0.16, 0.70, 0.24);           // C6 (Beautiful G-C arpeggio resolution)
-    
-    // Add sub-bass warmth to feel extremely tactile
-    const subOsc = ctx.createOscillator();
-    const subGain = ctx.createGain();
-    subOsc.type = 'triangle';
-    subOsc.frequency.setValueAtTime(261.63, now + 0.08); // C4 soft sub bass
-    subGain.gain.setValueAtTime(0.01, now + 0.08);
-    subGain.gain.linearRampToValueAtTime(0.05, now + 0.12);
-    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
-    subOsc.connect(subGain);
-    subGain.connect(filter);
-    subOsc.start(now + 0.08);
-    subOsc.stop(now + 0.65);
+      // GPay chime arpeggio (E-flat major arpeggio, beautiful resolution):
+      const now = ctx.currentTime;
+      playTone(587.33, now, 0.45, 0.12);                  // D5
+      playTone(784.00, now + 0.08, 0.55, 0.18);            // G5
+      playTone(1046.50, now + 0.16, 0.70, 0.24);           // C6
+      
+      // Add sub-bass warmth to feel extremely tactile
+      const subOsc = ctx.createOscillator();
+      const subGain = ctx.createGain();
+      subOsc.type = 'triangle';
+      subOsc.frequency.setValueAtTime(261.63, now + 0.08); // C4 soft sub bass
+      subGain.gain.setValueAtTime(0.01, now + 0.08);
+      subGain.gain.linearRampToValueAtTime(0.05, now + 0.12);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      subOsc.connect(subGain);
+      subGain.connect(filter);
+      subOsc.start(now + 0.08);
+      subOsc.stop(now + 0.65);
 
-  } catch (err) {
-    console.warn("Audio Context failed to start:", err);
-  }
+    } catch (err) {
+      console.warn("Audio Context failed to start:", err);
+    }
+  }, 100);
 };
 
 export const GPaySuccessScreen: React.FC<GPaySuccessScreenProps> = ({
@@ -95,29 +102,29 @@ export const GPaySuccessScreen: React.FC<GPaySuccessScreenProps> = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-zinc-950 px-4 py-8 overflow-y-auto custom-scrollbar">
-      {/* Background Ambience */}
-      <div className="absolute inset-x-0 top-0 h-[40vh] bg-gradient-to-b from-cyan-950/20 via-emerald-950/10 to-transparent pointer-events-none" />
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[35rem] h-[35rem] rounded-full blur-[140px] bg-emerald-500/5 mix-blend-screen pointer-events-none" />
-      <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[25rem] h-[25rem] rounded-full blur-[120px] bg-cyan-500/10 mix-blend-screen pointer-events-none" />
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-zinc-950 px-4 py-8 overflow-y-auto custom-scrollbar gpu-accelerated">
+      {/* Background Ambience / Hardware-accelerated gradients */}
+      <div className="absolute inset-x-0 top-0 h-[40vh] bg-gradient-to-b from-cyan-950/20 via-emerald-950/10 to-transparent pointer-events-none transform-gpu" />
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[35rem] h-[35rem] rounded-full blur-[140px] bg-emerald-500/5 mix-blend-screen pointer-events-none transform-gpu" />
+      <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[25rem] h-[25rem] rounded-full blur-[120px] bg-cyan-500/10 mix-blend-screen pointer-events-none transform-gpu" />
 
-      <div className="w-full max-w-md flex flex-col items-center select-none relative z-10 space-y-8 py-8">
+      <div className="w-full max-w-md flex flex-col items-center select-none relative z-10 space-y-8 py-8 gpu-accelerated">
         
         {/* Ring & Circle Success Hub */}
-        <div className="relative w-72 h-72 flex items-center justify-center">
+        <div className="relative w-72 h-72 flex items-center justify-center transform-gpu">
           
           {/* Animated Halo Rings */}
           <motion.div 
             initial={{ scale: 0.2, opacity: 0 }}
             animate={{ scale: 1.4, opacity: [0, 0.4, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut', repeatDelay: 1 }}
-            className="absolute w-48 h-48 rounded-full border border-emerald-400/30"
+            className="absolute w-48 h-48 rounded-full border border-emerald-400/30 transform-gpu"
           />
           <motion.div 
             initial={{ scale: 0.1, opacity: 0 }}
             animate={{ scale: 1.7, opacity: [0, 0.2, 0] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut', repeatDelay: 0.7 }}
-            className="absolute w-48 h-48 rounded-full border border-cyan-400/20"
+            className="absolute w-48 h-48 rounded-full border border-cyan-400/20 transform-gpu"
           />
 
           {/* GPay Central Coin/Card with a gorgeous cyan-emerald gradient glow */}
@@ -125,9 +132,9 @@ export const GPaySuccessScreen: React.FC<GPaySuccessScreenProps> = ({
             initial={{ scale: 0, rotate: -15 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', damping: 15, stiffness: 120, duration: 0.6 }}
-            className="relative z-10 w-44 h-44 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-400 p-[3px] shadow-[0_0_50px_rgba(16,185,129,0.35)] flex items-center justify-center"
+            className="relative z-10 w-44 h-44 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-400 p-[3px] shadow-[0_0_50px_rgba(16,185,129,0.35)] flex items-center justify-center transform-gpu"
           >
-            <div className="w-full h-full rounded-full bg-zinc-900 flex flex-col items-center justify-center relative overflow-hidden p-6 text-center">
+            <div className="w-full h-full rounded-full bg-zinc-900 flex flex-col items-center justify-center relative overflow-hidden p-6 text-center transform-gpu">
               {/* Inner ambient ring */}
               <div className="absolute inset-3 rounded-full border border-zinc-800 pointer-events-none" />
               

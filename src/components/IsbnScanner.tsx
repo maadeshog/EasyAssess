@@ -22,6 +22,7 @@ export const IsbnScanner: React.FC<IsbnScannerProps> = ({ onScanSuccess, onClose
 
   const qrCodeInstance = useRef<Html5Qrcode | null>(null);
   const SCAN_ELEMENT_ID = 'isbn-camera-reader';
+  const simulationRef = useRef<number | null>(null);
 
   // Request cameras list and initialize scanner
   useEffect(() => {
@@ -48,6 +49,9 @@ export const IsbnScanner: React.FC<IsbnScannerProps> = ({ onScanSuccess, onClose
 
     return () => {
       stopCameraScan();
+      if (simulationRef.current !== null) {
+        cancelAnimationFrame(simulationRef.current);
+      }
     };
   }, []);
 
@@ -154,18 +158,20 @@ export const IsbnScanner: React.FC<IsbnScannerProps> = ({ onScanSuccess, onClose
     setIsSimulating(true);
     setSimulatedProgress(0);
 
-    // Simulated scanning visual timeline adjusted for high-refresh 120Hz Displays
-    const interval = setInterval(() => {
-      setSimulatedProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          handleScanValue(preset.isbn);
-          setIsSimulating(false);
-          return 100;
-        }
-        return Math.min(100, prev + 0.8); // Increment smoothly at 8.33ms intervals (exactly matching 120Hz display refreshes)
-      });
-    }, 8.33);
+    let currentProgress = 0;
+    const animate = () => {
+      // Advance progress smoothly based on the monitor's native refresh cycles (supports 60Hz, 120Hz, etc.)
+      currentProgress += 1.2;
+      if (currentProgress >= 100) {
+        setSimulatedProgress(100);
+        handleScanValue(preset.isbn);
+        setIsSimulating(false);
+      } else {
+        setSimulatedProgress(currentProgress);
+        simulationRef.current = requestAnimationFrame(animate);
+      }
+    };
+    simulationRef.current = requestAnimationFrame(animate);
   };
 
   return (
