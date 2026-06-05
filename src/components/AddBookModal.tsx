@@ -7,6 +7,7 @@ import { Button, Input } from './ui';
 import { motion, AnimatePresence } from 'motion/react';
 import { IsbnScanner } from './IsbnScanner';
 import { ScannerPrefillData, PRESET_BOOKS } from '@/src/lib/asuPresets';
+import { GPaySuccessScreen } from './GPaySuccessScreen';
 
 const isValidISBN = (isbn: string) => {
   const clean = isbn.replace(/[-\s]/g, '');
@@ -525,20 +526,17 @@ export const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onA
               )}
 
               {step === 'success' && (
-                <div className="p-12 flex flex-col items-center justify-center text-center space-y-8 min-h-[400px]">
-                  <div className="h-24 w-24 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500">
-                    <Plus size={48} />
-                  </div>
-                  <div className="space-y-3">
-                    <h3 className="text-3xl font-serif font-bold text-white">Resource Registered</h3>
-                    <p className="text-zinc-500 max-w-xs mx-auto">
-                      Submission successful. The resource has passed automated screening and is now ready for <strong>3. Expert Review</strong>.
-                    </p>
-                  </div>
-                  <Button onClick={handleClose} className="px-12 h-14 rounded-2xl cyan-gradient text-white font-bold shadow-lg">
-                    Return to Archive
-                  </Button>
-                </div>
+                <GPaySuccessScreen
+                  title="Resource Registered"
+                  subtitle="Submission completed successfully. The resource has passed automated screening and is now listed for expert peer-review."
+                  details={[
+                    { label: 'Resource Title', value: watch('title') || 'New Textbook' },
+                    { label: 'Lead Author', value: watch('author') || 'Expert Evaluator' },
+                    { label: 'ISBN Checksum', value: watch('isbn') || 'Auto-Screened' },
+                    { label: 'ASU Speciality', value: `${watch('system')} System` },
+                  ]}
+                  onDone={handleClose}
+                />
               )}
             </div>
           </motion.div>

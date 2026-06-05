@@ -182,9 +182,21 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
               label="Total Books" 
               value={books.length} 
             />
-            <StatCard icon={<TrendingUp size={24} />} label="Assessments" value={assessments.length} />
-            <StatCard icon={<Users size={24} />} label="Evaluators" value={React.useMemo(() => new Set(assessments.map(a => a.userId)).size, [assessments])} />
-            <StatCard icon={<ShieldCheck size={24} />} label="Security Level" value="Verified" />
+            <StatCard 
+              icon={<TrendingUp size={24} />} 
+              label="Assessed" 
+              value={React.useMemo(() => books.filter(b => assessments.some(a => a.bookId === b.id)).length, [books, assessments])} 
+            />
+            <StatCard 
+              icon={<Layers size={24} />} 
+              label="In Progress" 
+              value={React.useMemo(() => books.filter(b => !assessments.some(a => a.bookId === b.id)).length, [books, assessments])} 
+            />
+            <StatCard 
+              icon={<Star size={24} />} 
+              label="Wishlist" 
+              value={React.useMemo(() => books.filter(b => b.committeeDecision === 'pending' || !b.committeeDecision).length, [books])} 
+            />
           </>
         )}
       </section>

@@ -25,8 +25,9 @@ import { collection, onSnapshot, doc, setDoc, getDocFromServer, deleteDoc, updat
 import { handleFirestoreError, OperationType } from './lib/firestore-error';
 import { ShieldCheck, BookOpen } from 'lucide-react';
 import { Button } from './components/ui';
+import { GPaySuccessScreen } from './components/GPaySuccessScreen';
 
-type View = 'landing' | 'dashboard' | 'assess' | 'details' | 'profile' | 'trash' | 'admin' | 'settings' | 'chat';
+type View = 'landing' | 'dashboard' | 'assess' | 'details' | 'profile' | 'trash' | 'admin' | 'settings' | 'chat' | 'submitted-success';
 
 export default function App() {
   const [view, setView] = useState<View>('landing');
@@ -36,6 +37,12 @@ export default function App() {
   const [books, setBooks] = useState<Book[]>([]);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [submittedDetails, setSubmittedDetails] = useState<{
+    id?: string;
+    title: string;
+    recommendation: string;
+    scores: any;
+  } | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [minLoadingTimePassed, setMinLoadingTimePassed] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
@@ -410,8 +417,13 @@ export default function App() {
 
     try {
       await setDoc(doc(db, 'assessments', newId), newAssessment);
-      setView('dashboard');
-      setSelectedBook(null);
+      setSubmittedDetails({
+        id: newId,
+        title: selectedBook.title,
+        recommendation: data.recommendation,
+        scores: data.scores,
+      });
+      setView('submitted-success');
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, `assessments/${newId}`);
     }
@@ -695,6 +707,32 @@ export default function App() {
                       userLanguage={user?.language}
                       onCancel={() => setView('landing')}
                       onSubmit={handleSubmitAssessment}
+                    />
+                  </motion.div>
+                )}
+                {view === 'submitted-success' && submittedDetails && (
+                  <motion.div
+                    key="submitted-success"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-50 bg-zinc-950"
+                  >
+                    <GPaySuccessScreen
+                      title="Evaluation Submitted"
+                      subtitle="Your academic assessment has been registered and verified on the secure peer-review database."
+                      details={[
+                        { label: 'Resource Title', value: submittedDetails.title },
+                        { label: 'Decision Verdict', value: submittedDetails.recommendation.toUpperCase().replace('-', ' ') },
+                        { label: 'Content Accuracy', value: `${submittedDetails.scores?.contentAccuracy || 5} / 10` },
+                        { label: 'Resource Pedagogy', value: `${submittedDetails.scores?.pedagogy || 5} / 10` },
+                        { label: 'Overall Relevance', value: `${submittedDetails.scores?.relevance || 5} / 10` },
+                      ]}
+                      onDone={() => {
+                        setView('dashboard');
+                        setSubmittedDetails(null);
+                        setSelectedBook(null);
+                      }}
                     />
                   </motion.div>
                 )}

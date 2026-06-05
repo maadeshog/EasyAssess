@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, Bot, User, Loader2, Sparkles, BookOpen, Trash2, Mic, MicOff, Search, X, ArrowLeft } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 import { Button, Input } from './ui';
 import { cn } from '@/src/lib/utils';
 import { Book, Assessment, UserProfile } from '../types';
@@ -106,48 +105,31 @@ export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, o
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      
       const userLang = currentUser?.language || "English";
-      const context = `
-        You are the EasyAssess AI Assistant. You have access to the user's academic archive.
-        The current evaluator's preferred language is ${userLang}. Always prioritize converse, suggestions, rubrics translation, and feedback explanations in ${userLang}.
-        If the evaluator asks about textbooks or assessments, proactively suggest translated rubrics, localized study criteria, or conduct the chat sessions in ${userLang}.
-
-        Current Stats:
-        - Total Books: ${books.length}
-        - Total Assessments: ${assessments.length}
-        
-        Archive Contents (include study language information if present):
-        ${books.map(b => `- ${b.title} by ${b.author} (${b.type}, Language: ${b.language || 'English'})`).join('\n')}
-        
-        Recent Assessments:
-        ${assessments.slice(0, 5).map(a => {
-          const book = books.find(b => b.id === a.bookId);
-          return `- Assessment for "${book?.title}" by ${a.userName}: ${a.recommendation} (Comments: ${a.comments})`;
-        }).join('\n')}
-
-        Be professional, academic, helpful, and localized to the preferred language. If asked about a specific book, use this context.
-      `;
-
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [
-          { role: 'user', parts: [{ text: context }] },
-          ...messages.map(m => ({
-            role: m.role === 'user' ? 'user' : 'model',
-            parts: [{ text: m.content }]
-          })),
-          { role: 'user', parts: [{ text: input }] }
-        ],
-        config: {
-          systemInstruction: `You are the EasyAssess AI Assistant. Provide professional guidance on academic resources and assessment results. The evaluator's preferred language is ${userLang} — proactively localized and translate rubrics, suggest localized assessment parameters or study criteria, and talk in ${userLang} as appropriate.`,
-        }
+      
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage],
+          books,
+          assessments,
+          userLang,
+        }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
 
       const assistantMessage: Message = {
         role: 'assistant',
-        content: response.text || "I'm sorry, I couldn't process that request."
+        content: result.text || "I'm sorry, I couldn't process that request."
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
