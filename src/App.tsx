@@ -583,7 +583,7 @@ export default function App() {
             transition={{ duration: 0.8 }}
             className="min-h-screen"
           >
-            <LoginPage />
+            <LoginPage onBypass={handleBypass} />
           </motion.div>
         ) : !isVerified ? (
           <motion.div

@@ -5,7 +5,7 @@ import { Button, Input } from './ui';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signInWithPopup, signInWithRedirect, GoogleAuthProvider, sendPasswordResetEmail } from 'firebase/auth';
 
-export const LoginPage: React.FC = () => {
+export const LoginPage: React.FC<{ onBypass?: () => void }> = ({ onBypass }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -354,7 +354,7 @@ export const LoginPage: React.FC = () => {
                   variant="outline"
                   onClick={handleGoogleLogin}
                   disabled={isLoading}
-                  className="h-14 rounded-2xl border-noir-border/40 text-white hover:bg-black/80 font-bold bg-black/60 shadow-[0_0_20px_rgba(8,145,178,0.1)] hover:shadow-[0_0_30px_rgba(8,145,178,0.2)] transition-all flex items-center justify-center gap-3 w-full"
+                  className="h-14 rounded-2xl border-noir-border/40 text-zinc-300 hover:text-white hover:bg-black/80 font-bold bg-black/60 shadow-[0_0_20px_rgba(8,145,178,0.1)] hover:shadow-[0_0_30px_rgba(8,145,178,0.2)] transition-all flex items-center justify-center gap-3 w-full"
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -364,6 +364,18 @@ export const LoginPage: React.FC = () => {
                   </svg>
                   {isLogin ? 'Sign in with Google ' : 'Create Account with Google '}
                 </Button>
+
+                {onBypass && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onBypass}
+                    className="h-14 rounded-2xl border-cyan-500/40 text-cyan hover:bg-cyan/10 hover:border-cyan hover:text-white font-bold bg-black/40 shadow-lg shadow-cyan/5 transition-all flex items-center justify-center gap-3 w-full animate-pulse hover:animate-none"
+                  >
+                    <BookOpen size={18} />
+                    Continue as Guest Evaluator
+                  </Button>
+                )}
               </div>
 
               <div className="mt-8 text-center">
