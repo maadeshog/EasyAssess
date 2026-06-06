@@ -104,74 +104,84 @@ export const GPaySuccessScreen: React.FC<GPaySuccessScreenProps> = ({
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-zinc-950 px-4 py-8 overflow-y-auto custom-scrollbar gpu-accelerated">
       {/* Background Ambience / Hardware-accelerated gradients */}
-      <div className="absolute inset-x-0 top-0 h-[40vh] bg-gradient-to-b from-cyan-950/20 via-emerald-950/10 to-transparent pointer-events-none transform-gpu" />
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[35rem] h-[35rem] rounded-full blur-[140px] bg-emerald-500/5 mix-blend-screen pointer-events-none transform-gpu" />
-      <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[25rem] h-[25rem] rounded-full blur-[120px] bg-cyan-500/10 mix-blend-screen pointer-events-none transform-gpu" />
+      <div className="absolute inset-x-0 top-0 h-[40vh] bg-gradient-to-b from-green-950/20 via-green-950/10 to-transparent pointer-events-none transform-gpu" />
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[35rem] h-[35rem] rounded-full blur-[140px] bg-green-500/5 mix-blend-screen pointer-events-none transform-gpu" />
+      <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[25rem] h-[25rem] rounded-full blur-[120px] bg-green-500/10 mix-blend-screen pointer-events-none transform-gpu" />
 
       <div className="w-full max-w-md flex flex-col items-center select-none relative z-10 space-y-8 py-8 gpu-accelerated">
         
-        {/* Ring & Circle Success Hub */}
-        <div className="relative w-72 h-72 flex items-center justify-center transform-gpu">
+        {/* Ring & Circle Success Hub - Cyber Green Ripple Style */}
+        <div className="relative w-80 h-80 flex items-center justify-center transform-gpu">
+          
+          {/* Constantly expanding energy ripples from the video */}
+          {[...Array(3)].map((_, i) => (
+            <motion.div
+              key={`ripple-${i}`}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: [0.8, 2], opacity: [0, 0.5, 0] }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                delay: i * 0.8,
+                ease: "easeOut"
+              }}
+              className="absolute inset-0 border-[2px] border-green-500/30 rounded-full blur-[2px] transform-gpu"
+            />
+          ))}
+
+          {/* Intense "Shockwave" Energy surge matching the video's peak pulses */}
+          <motion.div
+            animate={{ 
+              scale: [1, 1.4, 1.1],
+              opacity: [0, 0.3, 0],
+              filter: ["brightness(1) blur(0px)", "brightness(2) blur(4px)", "brightness(1) blur(0px)"]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute inset-0 border-[12px] border-green-400/10 rounded-full transform-gpu"
+          />
           
           {/* Animated Halo Rings */}
           <motion.div 
             initial={{ scale: 0.2, opacity: 0 }}
             animate={{ scale: 1.4, opacity: [0, 0.4, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut', repeatDelay: 1 }}
-            className="absolute w-48 h-48 rounded-full border border-emerald-400/30 transform-gpu"
-          />
-          <motion.div 
-            initial={{ scale: 0.1, opacity: 0 }}
-            animate={{ scale: 1.7, opacity: [0, 0.2, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut', repeatDelay: 0.7 }}
-            className="absolute w-48 h-48 rounded-full border border-cyan-400/20 transform-gpu"
+            className="absolute w-48 h-48 rounded-full border border-green-400/40 transform-gpu"
           />
 
-          {/* GPay Central Coin/Card with a gorgeous cyan-emerald gradient glow */}
+          {/* Central Cyber Green Hub */}
           <motion.div 
             initial={{ scale: 0, rotate: -15 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', damping: 15, stiffness: 120, duration: 0.6 }}
-            className="relative z-10 w-44 h-44 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-400 p-[3px] shadow-[0_0_50px_rgba(16,185,129,0.35)] flex items-center justify-center transform-gpu"
+            transition={{ type: 'spring', damping: 12, stiffness: 100, duration: 0.6 }}
+            className="relative z-10 w-44 h-44 rounded-full bg-green-500 p-[4px] shadow-[0_0_60px_rgba(34,197,94,0.5)] flex items-center justify-center transform-gpu"
           >
-            <div className="w-full h-full rounded-full bg-zinc-900 flex flex-col items-center justify-center relative overflow-hidden p-6 text-center transform-gpu">
-              {/* Inner ambient ring */}
-              <div className="absolute inset-3 rounded-full border border-zinc-800 pointer-events-none" />
+            <div className="w-full h-full rounded-full bg-zinc-950 flex flex-col items-center justify-center relative overflow-hidden transform-gpu">
+              {/* Inner ambient ring with high glow */}
+              <div className="absolute inset-0 rounded-full border-[8px] border-green-500 shadow-[inset_0_0_20px_rgba(34,197,94,0.4)] pointer-events-none" />
               
-              {/* Draw animated SVG checkmark & ring */}
-              <svg className="w-24 h-24 text-emerald-400 overflow-visible" viewBox="0 0 100 100">
-                {/* SVG circular drawing line */}
-                <motion.circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  stroke="currentColor"
-                  strokeWidth="3.5"
-                  fill="transparent"
-                  strokeLinecap="round"
-                  initial={{ strokeDasharray: '251', strokeDashoffset: '251' }}
-                  animate={{ strokeDashoffset: '0' }}
-                  transition={{ duration: 0.7, ease: "easeOut" }}
-                />
-                
-                {/* Interactive check drawing path */}
+              {/* Central Checkmark - Bold Neon Green Drawing Action */}
+              <svg className="w-24 h-24 text-green-500 overflow-visible drop-shadow-[0_0_20px_rgba(34,197,94,0.95)]" viewBox="0 0 100 100">
                 <motion.path
-                  d="M32 52 L44 64 L68 38"
-                  stroke="#10b981"
-                  strokeWidth="6"
+                  d="M30 52 L44 66 L72 38"
+                  stroke="currentColor"
+                  strokeWidth="8"
                   fill="transparent"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  initial={{ strokeDasharray: '60', strokeDashoffset: '60' }}
+                  initial={{ strokeDasharray: '80', strokeDashoffset: '80' }}
                   animate={{ strokeDashoffset: '0' }}
-                  transition={{ delay: 0.45, duration: 0.4, ease: "easeOut" }}
+                  transition={{ delay: 0.45, duration: 0.55, ease: "easeOut" }}
                 />
               </svg>
             </div>
           </motion.div>
 
-          {/* Dynamic GPay Sparklers, Dots, and Stars shooting outwards */}
-          {Array.from({ length: 8 }).map((_, i) => {
+          {/* Shooting Green Sparklers */}
+          {Array.from({ length: 12 }).map((_, i) => {
             const angle = (i * 45) * (Math.PI / 180);
             const distance = 120; // Radius distance
             const targetX = Math.cos(angle) * distance;
@@ -193,11 +203,9 @@ export const GPaySuccessScreen: React.FC<GPaySuccessScreenProps> = ({
                   ease: [0.19, 1, 0.22, 1] 
                 }}
                 className={`absolute w-3 h-3 rounded-full flex items-center justify-center ${
-                  i % 3 === 0 
-                    ? 'bg-cyan-400 text-cyan-200' 
-                    : i % 3 === 1 
-                      ? 'bg-emerald-400 text-emerald-200' 
-                      : 'bg-yellow-400 text-yellow-200'
+                  i % 2 === 0 
+                    ? 'bg-green-400 text-green-200' 
+                    : 'bg-emerald-400 text-emerald-200'
                 }`}
               >
                 {i % 2 === 0 ? (
@@ -220,25 +228,25 @@ export const GPaySuccessScreen: React.FC<GPaySuccessScreenProps> = ({
           <h3 className="text-3xl font-serif font-black text-white leading-tight tracking-tight">
             {title}
           </h3>
-          <p className="text-zinc-400/90 text-sm max-w-sm mx-auto font-light leading-relaxed">
+          <p className="text-zinc-500 text-sm max-w-sm mx-auto font-light leading-relaxed">
             {subtitle}
           </p>
         </motion.div>
 
-        {/* GPay Style Detailed Transaction Receipt */}
+        {/* Cyber Green Style Detailed Transaction Receipt */}
         <motion.div
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.7 }}
-          className="w-full bg-zinc-900/90 border border-zinc-800/80 backdrop-blur-md rounded-[32px] p-6 shadow-xl space-y-6 relative overflow-hidden"
+          className="w-full bg-zinc-900/60 border border-green-500/10 backdrop-blur-xl rounded-[32px] p-6 shadow-2xl space-y-6 relative overflow-hidden"
         >
-          {/* Subtle GPay-style receipt cuts background effect */}
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500/25 via-cyan-500/25 to-emerald-500/25" />
+          {/* Subtle Cyber-style receipt top edge */}
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-green-500/20 via-green-400/40 to-green-500/20" />
 
           <div className="flex items-center justify-between border-b border-zinc-800/60 pb-4">
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Verified & active</span>
+              <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-green-400">Verified & active</span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] font-mono text-zinc-500">
               <Calendar size={10} />
@@ -256,8 +264,8 @@ export const GPaySuccessScreen: React.FC<GPaySuccessScreenProps> = ({
 
             <div className="flex justify-between items-center gap-4 pt-2 border-t border-zinc-800/40">
               <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Receipt Ref</span>
-              <span className="text-xs font-mono font-bold text-cyan flex items-center gap-1">
-                <Hash size={10} className="text-cyan/40" />
+              <span className="text-xs font-mono font-bold text-green-400 flex items-center gap-1">
+                <Hash size={10} className="text-green-500/40" />
                 {txRef}
               </span>
             </div>
@@ -274,7 +282,7 @@ export const GPaySuccessScreen: React.FC<GPaySuccessScreenProps> = ({
           <button
             id="gpay-success-done"
             onClick={onDone}
-            className="w-full h-16 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-black text-base shadow-[0_0_35px_rgba(16,185,129,0.25)] hover:shadow-[0_0_50px_rgba(16,185,129,0.35)] transition-all flex items-center justify-center gap-3 relative overflow-hidden group cursor-pointer"
+            className="w-full h-16 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-500 text-white font-black text-base shadow-[0_0_35px_rgba(34,197,94,0.25)] hover:shadow-[0_0_50px_rgba(34,197,94,0.35)] transition-all flex items-center justify-center gap-3 relative overflow-hidden group cursor-pointer"
           >
             {/* Gloss shine effect on hover */}
             <div className="absolute inset-0 w-1/2 h-full bg-white/10 skew-x-[-25deg] translate-x-[-150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-out" />
