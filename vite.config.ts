@@ -14,7 +14,7 @@ export default defineConfig(({mode}) => {
         registerType: 'autoUpdate',
         manifestFilename: 'manifest.json',
         includeAssets: [
-          'logo.svg', 
+          'app-logo.png', 
           'favicon.ico', 
           'apple-touch-icon.png', 
           'favicon-32x32.png', 
@@ -69,15 +69,15 @@ export default defineConfig(({mode}) => {
               purpose: 'maskable'
             },
             {
-              src: '/logo.svg',
-              sizes: 'any',
-              type: 'image/svg+xml',
+              src: '/app-logo.png',
+              sizes: '512x512',
+              type: 'image/png',
               purpose: 'any'
             },
             {
-              src: '/logo.svg',
-              sizes: 'any',
-              type: 'image/svg+xml',
+              src: '/app-logo.png',
+              sizes: '512x512',
+              type: 'image/png',
               purpose: 'maskable'
             }
           ],

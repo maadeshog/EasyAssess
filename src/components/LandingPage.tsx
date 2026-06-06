@@ -27,12 +27,12 @@ export const LandingPage: React.FC<{
           style={{ willChange: 'transform' }}
           className="opacity-10 grayscale"
         >
-          <img src="/logo.svg" alt="" className="w-[600px] h-[600px] object-contain" />
+          <img src="/app-logo.png" alt="" className="w-[600px] h-[600px] object-contain" />
         </motion.div>
       </div>
 
       <div className="fixed -bottom-10 -left-10 text-zinc-900/5 pointer-events-none z-0 overflow-hidden sm:hidden">
-        <img src="/logo.svg" alt="" className="w-[250px] h-[250px] object-contain opacity-10 grayscale" />
+        <img src="/app-logo.png" alt="" className="w-[250px] h-[250px] object-contain opacity-10 grayscale" />
       </div>
 
       {/* Hero Section */}

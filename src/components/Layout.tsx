@@ -72,7 +72,7 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLog
   // Measure latency to show in the Dynamic Island status notification
   React.useEffect(() => {
     const start = performance.now();
-    fetch('/logo.svg', { method: 'HEAD' })
+    fetch('/app-logo.png', { method: 'HEAD' })
       .then(() => {
         setLatency(Math.round(performance.now() - start));
       })
@@ -139,7 +139,7 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLog
               }}
               className="flex h-8 w-8 items-center justify-center rounded-[24%] bg-black border border-white/10 overflow-hidden shadow-[0_2px_8px_rgba(8,145,178,0.25)]"
             >
-              <img src="/logo.svg" alt="EasyAssess Logo" className="h-6 w-6 object-contain" />
+              <img src="/app-logo.png" alt="EasyAssess Logo" className="h-6 w-6 object-contain" />
             </motion.div>
             
             {/* Smooth transition from brand text to compact badge */}
@@ -339,7 +339,7 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLog
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-[24%] bg-black border border-white/10 overflow-hidden p-1 shadow-[0_3px_10px_rgba(8,145,178,0.2)]">
-                <img src="/logo.svg" alt="EasyAssess Logo" className="h-full w-full object-contain" />
+                <img src="/app-logo.png" alt="EasyAssess Logo" className="h-full w-full object-contain" />
               </div>
               <span className="text-lg font-serif font-black text-zinc-400">EasyAssess</span>
             </div>

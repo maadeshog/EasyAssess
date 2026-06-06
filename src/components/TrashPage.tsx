@@ -79,7 +79,7 @@ export const TrashPage: React.FC<TrashPageProps> = ({
         <div className="space-y-8">
           <div className="flex items-center justify-between">
             <h3 className="text-2xl font-serif font-bold text-white flex items-center gap-3">
-              <img src="/logo.svg" alt="" className="h-6 w-6 object-contain" />
+              <img src="/app-logo.png" alt="" className="h-6 w-6 object-contain" />
               Trashed Resources
             </h3>
             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest bg-black/60 px-3 py-1 rounded-full">

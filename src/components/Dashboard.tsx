@@ -178,7 +178,7 @@ export const Dashboard: React.FC<DashboardProps> = React.memo(({ books, assessme
         ) : (
           <>
             <StatCard 
-              icon={<img src="/logo.svg" alt="Books" className="h-6 w-6 object-contain" />} 
+              icon={<img src="/app-logo.png" alt="Books" className="h-6 w-6 object-contain" />} 
               label="Total Books" 
               value={books.length} 
             />

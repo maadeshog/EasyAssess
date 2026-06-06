@@ -356,7 +356,7 @@ export const AIChat: React.FC<AIChatProps> = React.memo(({ books, assessments, o
                   )}
                 </button>
                 <div className="h-6 w-px bg-noir-border/20" />
-                <img src="/logo.svg" alt="" className="h-4 w-4 object-contain opacity-30" />
+                <img src="/app-logo.png" alt="" className="h-4 w-4 object-contain opacity-30" />
               </div>
             </div>
             <Button
