@@ -20,22 +20,34 @@ export const LoginPage: React.FC<{ onBypass?: () => void }> = ({ onBypass }) => 
     setIsLoading(true);
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      // On mobile or if we're in an iframe, redirect is often more reliable
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isIframe = window.self !== window.top;
+
+      if (isMobile || isIframe) {
+        await signInWithRedirect(auth, provider);
+      } else {
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (popupErr: any) {
+          console.warn('Popup blocked, trying redirect...', popupErr);
+          if (popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
+            setIsLoading(false);
+            return;
+          }
+          await signInWithRedirect(auth, provider);
+        }
+      }
     } catch (err: any) {
-      console.warn('Popup authentication style blocked/unsupported. Attempting fallback redirect...', err);
+      console.error('Google sign-in error:', err);
       if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
         setIsLoading(false);
         return;
       }
-      try {
-        const provider = new GoogleAuthProvider();
-        await signInWithRedirect(auth, provider);
-      } catch (redirectErr: any) {
-        console.error('Redirect sign-in also failed:', redirectErr);
-        setError("Your mobile web-view or frame is restricting popup capabilities. Please authenticate utilizing standard Email/Password.");
-      }
-    } finally {
+      setError("Social login is restricted in this environment. Please use your Email and Password, or click 'Continue as Guest' below.");
       setIsLoading(false);
+    } finally {
+      // If we are redirecting, the page will unload. If not (error or popup success), we might need to reset state.
     }
   };
 

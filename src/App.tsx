@@ -26,6 +26,7 @@ import { handleFirestoreError, OperationType } from './lib/firestore-error';
 import { ShieldCheck, BookOpen } from 'lucide-react';
 import { Button } from './components/ui';
 import { GPaySuccessScreen } from './components/GPaySuccessScreen';
+import { getRedirectResult } from 'firebase/auth';
 
 type View = 'landing' | 'dashboard' | 'assess' | 'details' | 'profile' | 'trash' | 'admin' | 'settings' | 'chat' | 'submitted-success';
 
@@ -169,6 +170,12 @@ export default function App() {
 
   // Auth Listener
   useEffect(() => {
+    // Handle redirect results on sign-in
+    getRedirectResult(auth).catch((error) => {
+      console.error("Redirect auth error:", error);
+      // We don't necessarily need to set an error here as the LoginPage will handle its own state
+    });
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setIsVerified(true); // Auto-verify all authenticated users to prevent any testing lockouts
