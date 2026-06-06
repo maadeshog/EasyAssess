@@ -25,8 +25,17 @@
     <script>
       // Animation safety fallback
       window.addEventListener('error', function(e) {
+        var msg = e.message || '';
+        var msgLower = msg.toLowerCase();
+        
+        // Ignore database, offline, network, connection or permission errors, plus WebSocket, HMR, or Vite-specific connection problems in global fatal prompt
+        if (msgLower.includes('offline') || msgLower.includes('network') || msgLower.includes('firebase') || msgLower.includes('firestore') || msgLower.includes('permission') || msgLower.includes('database') || msgLower.includes('unreachable') || msgLower.includes('unavailable') || msgLower.includes('websocket') || msgLower.includes('socket') || msgLower.includes('hmr') || msgLower.includes('vite')) {
+          console.warn('Non-fatal error ignored:', msg);
+          return;
+        }
+
         // Disable motion if an animation-related error occurs
-        if (e.message && (e.message.toLowerCase().includes('animation') || e.message.toLowerCase().includes('motion') || e.message.toLowerCase().includes('keyframes'))) {
+        if (msgLower.includes('animation') || msgLower.includes('motion') || msgLower.includes('keyframes')) {
            document.documentElement.classList.add('no-animations');
            console.warn('Animation engine failure detected, fallback to static mode.');
         }
@@ -45,6 +54,17 @@
           '<button onClick="window.location.reload()" style="margin-top: 2rem; padding: 0.75rem 1.5rem; background: #7f1d1d; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Hard Refresh Platform</button>';
       });
       window.addEventListener('unhandledrejection', function(e) {
+        var reason = e.reason && (e.reason.message || e.reason);
+        var reasonStr = String(reason || '');
+        var reasonLower = reasonStr.toLowerCase();
+
+        // Ignore database, offline, network, connection or permission errors, plus WebSocket, HMR, or Vite-specific connection problems in global fatal prompt
+        if (reasonLower.includes('offline') || reasonLower.includes('network') || reasonLower.includes('firebase') || reasonLower.includes('firestore') || reasonLower.includes('permission') || reasonLower.includes('database') || reasonLower.includes('unreachable') || reasonLower.includes('unavailable') || reasonLower.includes('websocket') || reasonLower.includes('socket') || reasonLower.includes('hmr') || reasonLower.includes('vite')) {
+          console.log('Non-fatal unhandled promise rejection ignored:', reason);
+          return;
+        }
+
+        var stack = e.reason && e.reason.stack;
         var errDiv = document.getElementById('fatal-browser-error-diagnostic');
         if (!errDiv) {
           errDiv = document.createElement('div');
@@ -52,8 +72,6 @@
           errDiv.className = 'error-diagnostic-overlay';
           document.body.appendChild(errDiv);
         }
-        var reason = e.reason && (e.reason.message || e.reason);
-        var stack = e.reason && e.reason.stack;
         errDiv.innerHTML = '<h2>Fatal Promise Rejection Crash Caught:</h2>' +
           '<p style="color: #fca5a5; font-weight: bold;">' + reason + '</p>' +
           '<pre style="color: #fda4af; background: #1c1917; padding: 1rem; border-radius: 8px; border: 1px solid #7f1d1d; margin-top: 1rem; overflow-x: auto;">' + (stack || 'No stacktrace available') + '</pre>' +

@@ -21,7 +21,7 @@ import { Book, Assessment, UserProfile } from './types';
 import { AnimatePresence, motion } from 'motion/react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, onSnapshot, doc, setDoc, getDocFromServer, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, getDoc, getDocFromServer, deleteDoc, updateDoc } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from './lib/firestore-error';
 import { ShieldCheck, BookOpen } from 'lucide-react';
 import { Button } from './components/ui';
@@ -175,7 +175,13 @@ export default function App() {
         
         try {
           const userRef = doc(db, 'users', firebaseUser.uid);
-          const userSnap = await getDocFromServer(userRef);
+          let userSnap;
+          try {
+            userSnap = await getDocFromServer(userRef);
+          } catch (serverErr: any) {
+            console.warn("getDocFromServer failed, attempting cached getDoc fallback:", serverErr);
+            userSnap = await getDoc(userRef);
+          }
           
           if (userSnap.exists()) {
             const userData = userSnap.data() as UserProfile;
@@ -201,11 +207,16 @@ export default function App() {
             };
             if (firebaseUser.email) newUserProfile.email = firebaseUser.email;
             if (firebaseUser.photoURL) newUserProfile.photoURL = firebaseUser.photoURL;
-            await setDoc(userRef, newUserProfile);
+            try {
+              await setDoc(userRef, newUserProfile);
+            } catch (setDocErr) {
+              console.warn("Failed to create user record directly (offline/restricted):", setDocErr);
+            }
             setUser(newUserProfile as UserProfile);
           }
           setIsAuthReady(true);
-        } catch (error) {
+        } catch (error: any) {
+          console.warn("Initializing with fallback local profile:", error);
           const fallbackProfile: any = {
             uid: firebaseUser.uid,
             displayName: firebaseUser.displayName || 'User',
@@ -216,7 +227,14 @@ export default function App() {
           if (firebaseUser.photoURL) fallbackProfile.photoURL = firebaseUser.photoURL;
           setUser(fallbackProfile as UserProfile);
           setIsAuthReady(true);
-          handleFirestoreError(error, OperationType.GET, `users/${firebaseUser.uid}`);
+
+          const errString = error instanceof Error ? error.message : String(error);
+          if (errString.includes('offline') || errString.includes('unreachable') || errString.includes('network') || errString.includes('unvailable')) {
+            setConnectionError("Offline Mode: Connected. Using cached/session-based data. Some server utilities may be unavailable.");
+          } else {
+            // Log non-fatal error
+            console.error("Non-fatal Firestore error during init:", error);
+          }
         }
       } else {
         setUser(null);
