@@ -137,9 +137,14 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLog
                 repeatType: "reverse",
                 ease: "easeInOut" 
               }}
-              className="flex h-8 w-8 items-center justify-center rounded-[24%] bg-black border border-white/10 overflow-hidden shadow-[0_2px_8px_rgba(8,145,178,0.25)]"
+              className="flex h-8 w-8 items-center justify-center rounded-[24%] overflow-hidden shadow-[0_2px_8px_rgba(8,145,178,0.25)]"
             >
-              <img src="/app-logo.png" alt="EasyAssess Logo" className="h-6 w-6 object-contain" />
+              <img 
+                src="/app-logo.png" 
+                alt="EasyAssess Logo" 
+                className="h-full w-full object-cover" 
+                style={{ backgroundColor: '#090808' }}
+              />
             </motion.div>
             
             {/* Smooth transition from brand text to compact badge */}
@@ -338,8 +343,8 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, user, onLog
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[24%] bg-black border border-white/10 overflow-hidden p-1 shadow-[0_3px_10px_rgba(8,145,178,0.2)]">
-                <img src="/app-logo.png" alt="EasyAssess Logo" className="h-full w-full object-contain" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-[24%] overflow-hidden shadow-[0_3px_10px_rgba(8,145,178,0.2)]">
+                <img src="/app-logo.png" alt="EasyAssess Logo" className="h-full w-full object-cover" />
               </div>
               <span className="text-lg font-serif font-black text-zinc-400">EasyAssess</span>
             </div>

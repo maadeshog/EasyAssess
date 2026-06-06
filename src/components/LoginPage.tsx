@@ -172,9 +172,9 @@ export const LoginPage: React.FC<{ onBypass?: () => void }> = ({ onBypass }) => 
                   repeatType: "reverse",
                   ease: "easeInOut" 
                 }}
-                className="h-16 w-16 rounded-[24%] bg-[#020202] flex items-center justify-center text-white border border-white/10 overflow-hidden shadow-[0_4px_15px_rgba(8,145,178,0.3)]"
+                className="h-16 w-16 rounded-[24%] overflow-hidden shadow-[0_4px_15px_rgba(8,145,178,0.3)]"
               >
-                <img src="/app-logo.png" alt="EasyAssess Logo" className="h-12 w-12 object-contain" />
+                <img src="/app-logo.png" alt="EasyAssess Logo" className="h-full w-full object-cover" />
               </motion.div>
               <motion.span 
                 initial={{ backgroundPosition: "200% 0" }}
@@ -221,9 +221,9 @@ export const LoginPage: React.FC<{ onBypass?: () => void }> = ({ onBypass }) => 
                   repeatType: "reverse",
                   ease: "easeInOut" 
                 }}
-                className="h-20 w-20 rounded-[24%] bg-[#020202] flex items-center justify-center text-white border border-white/10 overflow-hidden shadow-[0_5px_20px_rgba(8,145,178,0.4)]"
+                className="h-20 w-20 rounded-[24%] overflow-hidden shadow-[0_5px_20px_rgba(8,145,178,0.4)]"
               >
-                <img src="/app-logo.png" alt="EasyAssess Logo" className="h-14 w-14 object-contain" />
+                <img src="/app-logo.png" alt="EasyAssess Logo" className="h-full w-full object-cover" />
               </motion.div>
               <motion.span 
                 initial={{ backgroundPosition: "200% 0" }}

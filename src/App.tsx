@@ -535,9 +535,9 @@ export default function App() {
                     repeatType: "reverse",
                     ease: "easeInOut" 
                   }}
-                  className="relative h-28 w-28 rounded-[32px] bg-[#020202] border border-white/10 flex items-center justify-center text-white shadow-2xl backdrop-blur-md overflow-hidden"
+                  className="relative h-28 w-28 rounded-[32px] overflow-hidden shadow-2xl backdrop-blur-md"
                 >
-                  <img src="/app-logo.png" alt="EasyAssess Logo" className="relative z-10 h-20 w-20 object-contain animate-pulse" />
+                  <img src="/app-logo.png" alt="EasyAssess Logo" className="relative z-10 h-full w-full object-cover animate-pulse" />
                 </motion.div>
               </motion.div>
 
