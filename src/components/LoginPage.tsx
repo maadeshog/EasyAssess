@@ -20,44 +20,34 @@ export const LoginPage: React.FC<{ onBypass?: () => void }> = ({ onBypass }) => 
     setIsLoading(true);
     try {
       const provider = new GoogleAuthProvider();
-      
-      // Always try to use Popup first since it's most compatible with iframe/host context & doesn't disrupt parent page state
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (popupErr: any) {
-        console.warn('Google Popup sign-in option failed/blocked, trying redirect fallback...', popupErr);
-        
-        if (popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
-          setIsLoading(false);
-          return;
-        }
-        
-        // If popup was blocked or isn't supported, attempt redirect as next fallback
+      // On mobile or if we're in an iframe, redirect is often more reliable
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isIframe = window.self !== window.top;
+
+      if (isMobile || isIframe) {
         await signInWithRedirect(auth, provider);
+      } else {
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (popupErr: any) {
+          console.warn('Popup blocked, trying redirect...', popupErr);
+          if (popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
+            setIsLoading(false);
+            return;
+          }
+          await signInWithRedirect(auth, provider);
+        }
       }
     } catch (err: any) {
       console.error('Google sign-in error:', err);
-      
       if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
         setIsLoading(false);
         return;
       }
-
-      let userFriendlyMessage = "";
-      if (err.code === 'auth/operation-not-allowed') {
-        userFriendlyMessage = "Google Sign-In is not enabled in your Firebase Project. Please go to Firebase Console > Authentication > Sign-in method and enable Google provider.";
-      } else if (err.code === 'auth/unauthorized-domain') {
-        userFriendlyMessage = `This domain is not authorized for Google Sign-In in your Firebase Project. Please add this domain (${window.location.hostname}) to the list of Authorized Domains in Firebase Console > Authentication > Settings.`;
-      } else if (err.code === 'auth/popup-blocked') {
-        userFriendlyMessage = "The login popup was blocked by your browser. Please allow popups for this site, or try logging in with your Email and Password.";
-      } else {
-        userFriendlyMessage = `Social login is currently encountering an issue: ${err.message || String(err)} (Code: ${err.code || 'unknown'}). You can also log in using your Email & Password or 'Continue as Guest'.`;
-      }
-      
-      setError(userFriendlyMessage);
+      setError("Social login is restricted in this environment. Please use your Email and Password, or click 'Continue as Guest' below.");
       setIsLoading(false);
     } finally {
-      // Loader is reset on error/cancel, but if redirect starts, the page will unload
+      // If we are redirecting, the page will unload. If not (error or popup success), we might need to reset state.
     }
   };
 
