@@ -10,7 +10,7 @@ export const LoginPage: React.FC<{ onBypass?: () => void }> = ({ onBypass }) => 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<React.ReactNode>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [resetMessage, setResetMessage] = useState('');
@@ -20,34 +20,73 @@ export const LoginPage: React.FC<{ onBypass?: () => void }> = ({ onBypass }) => 
     setIsLoading(true);
     try {
       const provider = new GoogleAuthProvider();
-      // On mobile or if we're in an iframe, redirect is often more reliable
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isIframe = window.self !== window.top;
-
-      if (isMobile || isIframe) {
-        await signInWithRedirect(auth, provider);
-      } else {
-        try {
-          await signInWithPopup(auth, provider);
-        } catch (popupErr: any) {
-          console.warn('Popup blocked, trying redirect...', popupErr);
-          if (popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
-            setIsLoading(false);
-            return;
-          }
-          await signInWithRedirect(auth, provider);
+      
+      // Always try to use Popup first since it's most compatible with iframe/host context & doesn't disrupt parent page state
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (popupErr: any) {
+        console.warn('Google Popup sign-in option failed/blocked, trying redirect fallback...', popupErr);
+        
+        if (popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
+          setIsLoading(false);
+          return;
         }
+        
+        // If popup was blocked or isn't supported, attempt redirect as next fallback
+        await signInWithRedirect(auth, provider);
       }
     } catch (err: any) {
       console.error('Google sign-in error:', err);
+      
       if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
         setIsLoading(false);
         return;
       }
-      setError("Social login is restricted in this environment. Please use your Email and Password, or click 'Continue as Guest' below.");
+
+      let userFriendlyMessage: React.ReactNode = "";
+      if (err.code === 'auth/operation-not-allowed') {
+        userFriendlyMessage = "Google Sign-In is not enabled in your Firebase Project. Please go to Firebase Console > Authentication > Sign-in method and enable Google provider.";
+      } else if (err.code === 'auth/unauthorized-domain') {
+        const currentDomain = window.location.hostname;
+        userFriendlyMessage = (
+          <div className="text-left space-y-3">
+            <p className="font-bold text-red-400">
+              The domain "{currentDomain}" is unauthorized for Google Sign-In in the active Firebase project.
+            </p>
+            <p className="text-xs text-zinc-300 leading-relaxed">
+              If you exported this code to Vercel/external hosting, you are still running on our template's managed Firebase project, which cannot authorize external domains.
+            </p>
+            <div className="pt-2 border-t border-white/5 space-y-1.5">
+              <p className="text-xs font-bold text-zinc-200">How to authorize your custom domain:</p>
+              <ol className="list-decimal pl-4 text-xs space-y-1 text-zinc-400">
+                <li>Create your own free Firebase project at <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer" className="text-cyan underline hover:text-cyan-300">Firebase Console</a>.</li>
+                <li>Go to <strong>Authentication &gt; Settings &gt; Authorized Domains</strong> and add <code className="text-cyan-300 font-mono bg-white/5 px-1 py-0.5 rounded">{currentDomain}</code>.</li>
+                <li>Add your project's credentials as Vercel/hosting Environment Variables to switch automatically:</li>
+              </ol>
+              <div className="bg-black/50 border border-white/5 p-2 rounded-lg text-[10px] font-mono text-zinc-400 space-y-0.5 overflow-x-auto max-h-24">
+                <div>VITE_FIREBASE_API_KEY="..."</div>
+                <div>VITE_FIREBASE_AUTH_DOMAIN="..."</div>
+                <div>VITE_FIREBASE_PROJECT_ID="..."</div>
+                <div>VITE_FIREBASE_STORAGE_BUCKET="..."</div>
+                <div>VITE_FIREBASE_MESSAGING_SENDER_ID="..."</div>
+                <div>VITE_FIREBASE_APP_ID="..."</div>
+              </div>
+            </div>
+            <p className="text-xs text-center font-bold text-cyan-400 pt-1">
+              For now, you can sign in instantly using standard Email & Password, or click "Continue as Guest Evaluator" below.
+            </p>
+          </div>
+        );
+      } else if (err.code === 'auth/popup-blocked') {
+        userFriendlyMessage = "The login popup was blocked by your browser. Please allow popups for this site, or try logging in with your Email and Password.";
+      } else {
+        userFriendlyMessage = `Social login is currently encountering an issue: ${err.message || String(err)} (Code: ${err.code || 'unknown'}). You can also log in using your Email & Password or 'Continue as Guest'.`;
+      }
+      
+      setError(userFriendlyMessage);
       setIsLoading(false);
     } finally {
-      // If we are redirecting, the page will unload. If not (error or popup success), we might need to reset state.
+      // Loader is reset on error/cancel, but if redirect starts, the page will unload
     }
   };
 
